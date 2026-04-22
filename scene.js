@@ -1,7 +1,7 @@
 export function initScene() {
   const container = document.getElementById('canvas-container');
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = false;
   renderer.outputEncoding = THREE.sRGBEncoding;
