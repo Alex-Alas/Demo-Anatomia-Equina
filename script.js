@@ -110,7 +110,15 @@ loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js')
         model.traverse(child => {
           if (child.isMesh) {
             if (child.name.startsWith('Cylinder')) child.visible = false;
-            if (child.material && child.material.map) child.material.map.encoding = THREE.sRGBEncoding;
+            if (child.material) {
+              if (child.material.map) child.material.map.encoding = THREE.sRGBEncoding;
+              // Optimizacion extra para móviles: Apagar mapas pesados del material
+              if (window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent)) {
+                if (child.material.normalMap) child.material.normalMap = null;
+                if (child.material.roughnessMap) child.material.roughnessMap = null;
+                if (child.material.metalnessMap) child.material.metalnessMap = null;
+              }
+            }
           }
         });
         scene.add(model);

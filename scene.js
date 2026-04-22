@@ -1,7 +1,12 @@
 export function initScene() {
   const container = document.getElementById('canvas-container');
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const isMobile = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
+  
+  const renderer = new THREE.WebGLRenderer({ 
+    antialias: !isMobile,
+    powerPreference: "high-performance"
+  });
+  renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = false;
   renderer.outputEncoding = THREE.sRGBEncoding;
@@ -27,15 +32,15 @@ export function initScene() {
 
   const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
   fillLight.position.set(-5, 5, 5);
-  scene.add(fillLight);
+  if (!isMobile) scene.add(fillLight);
 
   const backLight = new THREE.DirectionalLight(0xffffff, 1.0);
   backLight.position.set(0, 5, -10);
-  scene.add(backLight);
+  if (!isMobile) scene.add(backLight);
 
   const bottomLight = new THREE.DirectionalLight(0xffffff, 0.7);
   bottomLight.position.set(0, -10, 0);
-  scene.add(bottomLight);
+  if (!isMobile) scene.add(bottomLight);
 
   // Ground & grid
   const gridHelper = new THREE.GridHelper(20, 30, 0x2a2e2b, 0x1e2220);
