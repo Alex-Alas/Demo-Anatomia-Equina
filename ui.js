@@ -12,7 +12,65 @@ const hotspotsLayer = document.getElementById('hotspots-layer');
 export const hotspotEls = {};
 
 export function initUI() {
-  document.getElementById('panel-close').addEventListener('click', () => panel.classList.remove('open'));
+  document.getElementById('panel-close').addEventListener('click', () => {
+    panel.classList.remove('open');
+    setTimeout(() => { panel.style.height = ''; }, 400);
+  });
+
+  // Fullscreen button
+  const fsBtn = document.getElementById('fullscreen-btn');
+  if (fsBtn) {
+    fsBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    });
+  }
+
+  // Swipe up/down logic for fluid dragging
+  let startY = 0;
+  let startHeight = 0;
+  const panelHandle = document.getElementById('panel-handle');
+  if (panelHandle) {
+    panelHandle.addEventListener('touchstart', e => {
+      startY = e.touches[0].clientY;
+      startHeight = panel.getBoundingClientRect().height;
+      panel.style.transition = 'none'; // Disable transition for 1:1 follow
+    });
+    
+    panelHandle.addEventListener('touchmove', e => {
+      const y = e.touches[0].clientY;
+      const deltaY = startY - y; // Positive if dragging up
+      let newHeight = startHeight + deltaY;
+      const maxHeight = window.innerHeight * 0.85;
+      
+      if (newHeight > maxHeight) newHeight = maxHeight;
+      panel.style.height = newHeight + 'px';
+    }, { passive: true });
+    
+    panelHandle.addEventListener('touchend', () => {
+      panel.style.transition = ''; // Restore CSS transition
+      const currentHeight = panel.getBoundingClientRect().height;
+      const minHeight = window.innerHeight * 0.35;
+      const maxHeight = window.innerHeight * 0.85;
+      
+      if (currentHeight < minHeight * 0.8) {
+        // Dragged down enough to close
+        panel.classList.remove('open');
+        setTimeout(() => { panel.style.height = ''; }, 400);
+      } else if (currentHeight > minHeight * 1.2) {
+        // Dragged up enough to expand
+        panel.style.height = maxHeight + 'px';
+      } else {
+        // Snap back to default minimum
+        panel.style.height = '';
+      }
+    });
+  }
 }
 
 export function openPanel(key) {
@@ -29,6 +87,7 @@ export function openPanel(key) {
     </div>
     <div class="panel-section"><h3>Relevancia Clínica</h3><p>${d.clinical}</p></div>
   `;
+  panel.style.height = ''; // Reset to default 35vh on new open
   panel.classList.add('open');
 }
 

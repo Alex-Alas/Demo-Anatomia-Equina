@@ -117,17 +117,21 @@ canvas { display: block; width: 100% !important; height: 100% !important; }
 #panel.open { transform: translateX(0); }
 .panel-header {
   padding: 30px;
-  background: linear-gradient(135deg, rgba(245,158,11,0.1), transparent);
+  background: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   flex-shrink: 0;
 }
 .panel-category {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--accent);
   font-size: 0.65rem;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 8px;
+  color: var(--bg);
+  margin-bottom: 12px;
 }
 .panel-title {
   font-size: 2.5rem;
@@ -224,8 +228,115 @@ canvas { display: block; width: 100% !important; height: 100% !important; }
   transition: opacity 0.8s;
 }
 #loading.hidden { opacity: 0; pointer-events: none; }
-.loading-logo { font-size: 3rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; text-shadow: 0 0 30px rgba(245, 158, 11, 0.3); }
-.loading-sub { font-size: 0.8rem; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text); margin-bottom: 50px; }
+.loading-logo { font-size: 3rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; text-shadow: 0 0 30px rgba(245, 158, 11, 0.3); text-align: center; padding: 0 20px; line-height: 1.1; }
+.loading-sub { font-size: 0.8rem; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; color: var(--text); margin-bottom: 50px; text-align: center; padding: 0 20px; }
 .loading-bar-wrap { width: 200px; height: 2px; background: rgba(255,255,255,0.1); overflow: hidden; }
 .loading-bar { height: 100%; background: var(--accent2); width: 0%; transition: width 0.3s ease; box-shadow: 0 0 10px var(--accent2); }
 .loading-status { margin-top: 20px; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+
+/* FAB & Mobile Responsiveness */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: var(--accent2);
+  color: var(--text);
+  border: none;
+  z-index: 300;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: all 0.3s;
+}
+.fab:hover { transform: scale(1.05); background: var(--accent); }
+.panel-handle { display: none; }
+#mobile-instructions { display: none; }
+
+@media (max-width: 768px) {
+  /* Minimize on-screen elements */
+  header, #hud, #legend { display: none !important; }
+  
+  /* Bottom Sheet Panel */
+  #panel {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 35vh; /* Reduced initial height */
+    will-change: height, transform;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(120%); /* Default hidden */
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  #panel.open {
+    transform: translateY(0);
+  }
+  
+  /* Drag handle */
+  .panel-handle {
+    display: block;
+    width: 50px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    margin: 15px auto 0 auto;
+    cursor: grab;
+  }
+  
+  /* Adjust header and close inside panel */
+  .panel-header { padding: 15px 30px; }
+  .panel-close { top: 15px; right: 15px; width: 30px; height: 30px; font-size: 1rem; }
+  
+  .fab {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .loading-logo { font-size: 2.2rem; }
+  .loading-sub { font-size: 0.7rem; }
+  
+  /* Mobile Instructions Overlay */
+  #mobile-instructions {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 30px;
+    left: 20px;
+    right: 20px;
+    z-index: 100;
+    pointer-events: none;
+    align-items: flex-start;
+  }
+  #mobile-instructions .title {
+    font-size: 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+    margin-bottom: 15px;
+  }
+  #mobile-instructions .title span {
+    color: var(--muted);
+    font-size: 0.7rem;
+    margin-left: 5px;
+  }
+  #mobile-instructions .hints {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(0,0,0,0.5);
+    padding: 8px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    line-height: 1.8;
+  }
+}
