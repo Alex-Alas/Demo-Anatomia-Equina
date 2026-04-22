@@ -17,14 +17,14 @@
 
 <header>
   <div class="logo">Demo: <span>Anatomía Equina</span></div>
-  <div class="header-right">DEMO TECNOLÓGICA<br><span style="color:var(--accent)">v0.2.4</span></div>
+  <div class="header-right">DEMO TECNOLÓGICA<br><span style="color:var(--accent)">v0.3.0</span></div>
 </header>
 
 <div id="canvas-container"></div>
 <div id="hotspots-layer" style="position:fixed;inset:0;pointer-events:none;z-index:50;"></div>
 
 <div id="mobile-instructions">
-  <div class="title">Demo: Anatomía Equina <span>v0.2.4</span></div>
+  <div class="title">Demo: Anatomía Equina <span>v0.3.0</span></div>
   <div class="hints">Arrastra para rotar • Pellizca para zoom • Toca los puntos</div>
 </div>
 
@@ -50,6 +50,13 @@
   <div class="legend-item"><div class="legend-dot vital"></div>Vital</div>
 </div>
 
+<div id="dev-tools-panel">
+  <div class="dev-header" id="dev-header">
+    <h3>Dev Tools: Meshes</h3>
+    <button id="dev-tools-toggle">▼</button>
+  </div>
+  <div id="dev-mesh-list"></div>
+</div>
 <!-- Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
@@ -57,12 +64,32 @@
   <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
 </button>
 
+<div id="zoom-controls">
+  <button id="zoom-in" class="fab zoom-btn" title="Acercar">＋</button>
+  <button id="zoom-out" class="fab zoom-btn" title="Alejar">－</button>
+</div>
+
 <!-- Service Worker Registration -->
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('ServiceWorker registrado:', reg.scope))
+        .then(reg => {
+          console.log('ServiceWorker registrado:', reg.scope);
+          
+          // Lógica de invalidación automática de caché
+          reg.onupdatefound = () => {
+            const installingWorker = reg.installing;
+            installingWorker.onstatechange = () => {
+              if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // Se encontró una nueva versión (ej. de v0.2.6 a v0.2.7). 
+                // El viejo caché ya se marcó para eliminación. Forzamos recarga.
+                console.log('🔄 Actualización detectada. Limpiando caché anterior y recargando página...');
+                window.location.reload();
+              }
+            };
+          };
+        })
         .catch(err => console.error('Error ServiceWorker:', err));
     });
   }

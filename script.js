@@ -11,6 +11,11 @@ const modelBox = new THREE.Box3();
 const HOTSPOTS_3D = HOTSPOT_FRACS.map(h => ({ ...h, pos: new THREE.Vector3() }));
 
 // ─── INITIALIZATION ───────────────────────────────────────────────────────
+const isMobileDevice = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
+if (isMobileDevice) {
+  console.log("📱 [Optimización Móvil] Activada. Aplicando recortes de renderizado y lógica agresiva...");
+}
+
 initUI();
 const { renderer, scene, camera, keyLight, fillLight, backLight, bottomLight, gridHelper, ground } = initScene();
 
@@ -74,6 +79,36 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
 });
 
+const zoomInBtn = document.getElementById('zoom-in');
+const zoomOutBtn = document.getElementById('zoom-out');
+if (zoomInBtn) {
+  zoomInBtn.addEventListener('click', () => {
+    sph.r = Math.max(0.5, sph.r - 2.0);
+    updateCamera();
+  });
+}
+if (zoomOutBtn) {
+  zoomOutBtn.addEventListener('click', () => {
+    sph.r = Math.min(200, sph.r + 2.0);
+    updateCamera();
+  });
+}
+
+const devHeader = document.getElementById('dev-header');
+if (devHeader) {
+  devHeader.addEventListener('click', () => {
+    const list = document.getElementById('dev-mesh-list');
+    const toggle = document.getElementById('dev-tools-toggle');
+    if (list.style.display === 'none') {
+      list.style.display = 'block';
+      toggle.textContent = '▼';
+    } else {
+      list.style.display = 'none';
+      toggle.textContent = '▶';
+    }
+  });
+}
+
 // ─── HOTSPOTS ─────────────────────────────────────────────────────────────
 HOTSPOTS_3D.forEach(hs => createHotspotDOM(hs));
 
@@ -107,13 +142,49 @@ loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js')
       (gltf) => {
         setProgress(85, "Ajustando escena…");
         const model = gltf.scene;
+        const devMeshList = document.getElementById('dev-mesh-list');
+        if (devMeshList) devMeshList.innerHTML = '';
+
         model.traverse(child => {
           if (child.isMesh) {
             if (child.name.startsWith('Cylinder')) child.visible = false;
+            
+            // Lógica para poblar el Dev Tools Panel
+            if (devMeshList && !child.name.startsWith('Cylinder')) {
+               const lbl = document.createElement('label');
+               lbl.className = 'dev-mesh-item';
+               
+               const cb = document.createElement('input');
+               cb.type = 'checkbox';
+               
+               // Evaluar si es una malla prescindible
+               let isHiddenByOptimization = false;
+               if (isMobileDevice) {
+                 const allowedMeshes = ['cabello_caballo', 'ZBrush_defualt_group010', 'pelaje'];
+                 if (!allowedMeshes.includes(child.name)) {
+                   isHiddenByOptimization = true;
+                   console.log(`✂️ [Optimización Móvil] Malla pre-ocultada: ${child.name}`);
+                 }
+               }
+               
+               if (isHiddenByOptimization) {
+                 child.visible = false;
+               }
+               
+               cb.checked = child.visible;
+               cb.onchange = (e) => {
+                 child.visible = e.target.checked;
+               };
+               
+               lbl.appendChild(cb);
+               lbl.appendChild(document.createTextNode(child.name || 'Malla sin nombre'));
+               devMeshList.appendChild(lbl);
+            }
+
             if (child.material) {
               if (child.material.map) child.material.map.encoding = THREE.sRGBEncoding;
               // Optimizacion extra para móviles: Apagar mapas pesados del material
-              if (window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent)) {
+              if (isMobileDevice) {
                 if (child.material.normalMap) child.material.normalMap = null;
                 if (child.material.roughnessMap) child.material.roughnessMap = null;
                 if (child.material.metalnessMap) child.material.metalnessMap = null;

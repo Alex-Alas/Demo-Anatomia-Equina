@@ -254,10 +254,95 @@ canvas { display: block; width: 100% !important; height: 100% !important; }
   transition: all 0.3s;
 }
 .fab:hover { transform: scale(1.05); background: var(--accent); }
+
+#zoom-controls {
+  position: fixed;
+  right: 20px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 300;
+}
+.zoom-btn {
+  position: static; /* Sobrescribe el position fixed de .fab */
+  width: 45px;
+  height: 45px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  border-radius: 50%;
+}
+
 .panel-handle { display: none; }
 #mobile-instructions { display: none; }
 
+/* Dev Tools Panel */
+#dev-tools-panel {
+  position: fixed;
+  top: 80px;
+  left: 20px;
+  width: 250px;
+  background: rgba(24, 24, 27, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dev-header {
+  padding: 10px 15px;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.dev-header h3 {
+  font-size: 0.7rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+#dev-tools-toggle {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  pointer-events: none;
+}
+#dev-mesh-list {
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+}
+.dev-mesh-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.dev-mesh-item input {
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+.dev-mesh-item:hover {
+  color: var(--text);
+}
+
 @media (max-width: 768px) {
+  #dev-tools-panel {
+    top: 90px;
+    left: 10px;
+    width: calc(100vw - 20px);
+  }
+
   /* Minimize on-screen elements */
   header, #hud, #legend { display: none !important; }
   

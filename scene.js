@@ -32,15 +32,15 @@ export function initScene() {
 
   const fillLight = new THREE.DirectionalLight(0xffffff, 1.2);
   fillLight.position.set(-5, 5, 5);
-  if (!isMobile) scene.add(fillLight);
+  scene.add(fillLight);
 
   const backLight = new THREE.DirectionalLight(0xffffff, 1.0);
   backLight.position.set(0, 5, -10);
-  if (!isMobile) scene.add(backLight);
+  scene.add(backLight);
 
   const bottomLight = new THREE.DirectionalLight(0xffffff, 0.7);
   bottomLight.position.set(0, -10, 0);
-  if (!isMobile) scene.add(bottomLight);
+  scene.add(bottomLight);
 
   // Ground & grid
   const gridHelper = new THREE.GridHelper(20, 30, 0x2a2e2b, 0x1e2220);

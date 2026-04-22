@@ -1,4 +1,4 @@
-const CACHE_NAME = 'anatomia-equina-v1';
+const CACHE_NAME = 'anatomia-equina-v0.2.8';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
