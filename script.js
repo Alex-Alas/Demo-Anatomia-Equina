@@ -11,6 +11,7 @@ const modelBox = new THREE.Box3();
 let currentSystemId = 'exterior';
 let HOTSPOTS_3D = [];
 let _initialR = 5; // Set after model loads; used as reference for zoom limits
+let devToolsActive = false; // Flag for developer mode interactions
 
 // ─── CAMERA ANIMATION STATE ───────────────────────────────────────────────
 // Smooth camera transitions: when animating, we lerp both target and sph.r
@@ -109,6 +110,44 @@ function focusOnPoint(clientX, clientY, camera) {
   showFocusRipple(clientX, clientY);
 }
 
+function logDevCoordinates(clientX, clientY) {
+  if (!horseModel || !modelBox) return;
+  raycaster.setFromCamera(screenToNDC(clientX, clientY), camera);
+  const meshes = [];
+  horseModel.traverse(c => { if (c.isMesh && c.visible) meshes.push(c); });
+  const hits = raycaster.intersectObjects(meshes, false);
+  
+  if (hits.length > 0) {
+    const P = hits[0].point;
+    const size = new THREE.Vector3();
+    modelBox.getSize(size);
+    
+    // Calculate fractional coordinates [0, 1] relative to the bounding box
+    const fracX = parseFloat(((P.x - modelBox.min.x) / size.x).toFixed(3));
+    const fracY = parseFloat(((P.y - modelBox.min.y) / size.y).toFixed(3));
+    const fracZ = parseFloat(((P.z - modelBox.min.z) / size.z).toFixed(3));
+    
+    const hotspotName = prompt("Nombre para este Hotspot (ej: cabeza, pulmon_izq):");
+    if (hotspotName !== null) {
+      const cleanName = hotspotName.trim().toLowerCase().replace(/\s+/g, '_');
+      const id = `${currentSystemId}_${cleanName}`;
+      
+      const hotspotJSON = {
+        id: id,
+        frac: [fracX, fracY, fracZ],
+        key: hotspotName.trim()
+      };
+
+      console.log(`%c [Dev Tool] Hotspot Creado:`, "color: #f59e0b; font-weight: bold; font-size: 1.2em;");
+      console.log(JSON.stringify(hotspotJSON, null, 2));
+      console.log(`%c Copia este objeto y pégalo en el array 'hotspots' de '${currentSystemId}' en constants.js`, "color: #a1a1aa; font-style: italic;");
+      
+      // Visual feedback
+      showFocusRipple(clientX, clientY);
+    }
+  }
+}
+
 // ─── FOCUS RIPPLE VISUAL FEEDBACK ────────────────────────────────────────
 function showFocusRipple(x, y) {
   const ripple = document.createElement('div');
@@ -153,10 +192,14 @@ function updateModelVisibility() {
       let shouldBeVisible = true;
       const lowerName = child.name.toLowerCase();
       
+      const sys = ANATOMICAL_SYSTEMS[currentSystemId];
       if (currentSystemId === 'esqueleto') {
         shouldBeVisible = lowerName.includes('esqueleto') || lowerName.includes('skeleton') || lowerName.includes('bone') || lowerName.includes('hueso');
       } else if (currentSystemId === 'muscular') {
         shouldBeVisible = lowerName.includes('musculo') || lowerName.includes('muscle') || lowerName.includes('muscular');
+      } else if (sys && sys.meshNames) {
+        // Generic mesh-name-based filter for systems that declare meshNames (e.g. respiratorio, bronquios)
+        shouldBeVisible = sys.meshNames.some(n => lowerName.includes(n.toLowerCase()));
       } else if (currentSystemId === 'exterior') {
         shouldBeVisible = !lowerName.includes('esqueleto') && !lowerName.includes('skeleton') && !lowerName.includes('bone') && !lowerName.includes('hueso') && !lowerName.includes('musculo') && !lowerName.includes('muscle') && !lowerName.includes('muscular');
         
@@ -228,8 +271,14 @@ const container = document.getElementById('canvas-container');
 let lastClickTime = 0;
 container.addEventListener('click', e => {
   const now = performance.now();
+  
+  // Dev mode interaction: capture coordinates for hotspots
+  if (devToolsActive) {
+    logDevCoordinates(e.clientX, e.clientY);
+  }
+
   if (now - lastClickTime < 320) {
-    // Double-click detected
+    // Double-click detected: focus on point
     focusOnPoint(e.clientX, e.clientY, camera);
   }
   lastClickTime = now;
@@ -389,17 +438,29 @@ window.enableDevTools = function() {
   const panel = document.getElementById('dev-tools-panel');
   if (panel) {
     panel.style.display = 'flex';
-    console.log('Dev Tools activadas. El panel ahora es visible.');
+    devToolsActive = true;
+    console.log('%c Dev Tools activadas. Click sobre el modelo para obtener coordenadas.', "color: #f59e0b; font-weight: bold;");
   }
 };
 window.disableDevTools = function() {
   const panel = document.getElementById('dev-tools-panel');
   if (panel) {
     panel.style.display = 'none';
-    console.log('Dev Tools desactivadas. El panel ahora esta oculto.');
+    devToolsActive = false;
+    console.log('Dev Tools desactivadas.');
   }
 };
-console.log('Escribe enableDevTools() o disableDevTools() en la consola para controlar las herramientas de desarrollo.');
+window.admin = function(command) {
+  if (command === "/gamemode 1") {
+    window.enableDevTools();
+  } else if (command === "/gamemode 0") {
+    window.disableDevTools();
+  } else {
+    console.log("Comando no reconocido. Prueba con admin('/gamemode 1')");
+  }
+};
+console.log('Escribe admin("/gamemode 1") en la consola para activar las herramientas de desarrollo.');
+
 
 // ─── RENDER LOOP ──────────────────────────────────────────────────────────
 function animate() {

@@ -106,5 +106,90 @@ export const ANATOMICAL_SYSTEMS = {
         clinical: "El cartílago escapular puede osificarse parcialmente con la edad."
       }
     }
+  },
+  respiratorio: {
+    id: "respiratorio",
+    label: "Respiratorio",
+    icon: "Resp.",
+    meshNames: ["larinje", "pulmon", "traquea"],
+    hotspots: [
+      { id: "resp_laringe",     frac: [0.494, 0.696, 0.745], key: "laringe" },
+      { id: "resp_traquea",     frac: [0.539, 0.742, 0.732], key: "traquea" },
+      { id: "resp_pulmon_izq", frac: [0.661, 0.462, 0.521], key: "pulmonIzquierdo" },
+      { id: "resp_pulmon_der", frac: [0.325, 0.465, 0.504], key: "pulmonDerecho" }
+    ],
+    data: {
+      laringe: {
+        label: "Laringe", category: "Via Aerea Superior", type: "structure",
+        description: "La laringe equina es una estructura cartilaginosa que conecta la faringe con la tráquea. Regula el flujo de aire, protege la vía aérea durante la deglución y participa en la fonación. El caballo es respirador nasal obligado, por lo que la integridad de la laringe es crítica para el rendimiento atlético.",
+        facts: [
+          { label: "Cartílagos", value: "Tiroides, Cricoides, Aritenoides (par), Epiglotis" },
+          { label: "Longitud", value: "~8–10 cm" },
+          { label: "Función", value: "Regulacion de flujo aéreo" },
+          { label: "Posición", value: "Caudal a la faringe" }
+        ],
+        subparts: ["Epiglotis", "Cartílago aritenoides (D/I)", "Cartílago tiroides", "Cartílago cricoides", "Pliegues vocales", "Músculo cricoaritenoideo dorsal"],
+        clinical: "La hemiplejia laríngea recurrente (parálisis del nervio laríngeo recurrente izquierdo) es una de las patologías respiratorias más frecuentes en caballos de alto rendimiento. Clínicamente se ausculta como un 'roar' o silbido inspiratorio. El tratamiento incluye la laringoplastia (tie-back) y/o la ventriculocordectomía."
+      },
+      traquea: {
+        label: "Tráquea", category: "Via Aerea Superior", type: "structure",
+        description: "Tubo fibrocartilaginoso que conduce el aire desde la laringe hasta la bifurcación bronquial (carina). Está formada por 48–60 anillos cartilaginosos en C conectados por músculo traqueal. Representa la principal vía de paso de aire hacia los pulmones.",
+        facts: [
+          { label: "Anillos cart.", value: "48–60 anillos en C" },
+          { label: "Longitud", value: "~70–80 cm" },
+          { label: "Diámetro", value: "~5–6 cm" },
+          { label: "Bifurcación", value: "A nivel de T5 (carina)" }
+        ],
+        subparts: ["Anillos cartilaginosos", "Músculo traqueal", "Mucosa traqueal", "Glándulas traqueales", "Carina"],
+        clinical: "La traqueítis bacteriana y la acumulación de moco son hallazgos frecuentes en el síndrome inflamatorio de las vías respiratorias (IRAP/IAD). El lavado traqueobronquial (BAL) se utiliza para el diagnóstico citológico. La traqueostomía de emergencia puede salvar la vida en obstrucciones superiores agudas."
+      },
+      pulmonIzquierdo: {
+        label: "Pulmón Izquierdo", category: "Sistema Respiratorio", type: "vital",
+        description: "El pulmón izquierdo equino consta de dos lóbulos (craneal y caudal) y ocupa la cavidad pleural izquierda. Durante el ejercicio, la ventilación pulmonar puede alcanzar 1.200–1.800 L/min, lo que exige una integridad estructural máxima de los alvéolos y capilares pulmonares.",
+        facts: [
+          { label: "Lóbulos", value: "Craneal y Caudal" },
+          { label: "Vol. aprox.", value: "~20 litros" },
+          { label: "Alvéolos", value: "~500 millones" },
+          { label: "Superficie de intercambio", value: "~100–120 m²" }
+        ],
+        subparts: ["Lóbulo craneal", "Lóbulo caudal", "Pleura visceral", "Bronquio principal izquierdo", "Bronquiolos", "Alvéolos", "Capilares pulmonares"],
+        clinical: "El sangrado pulmonar inducido por ejercicio (EIPH) afecta al 70–90% de los caballos de carrera. Se origina principalmente en el lóbulo caudal dorsal del pulmón izquierdo. La endoscopía post-ejercicio y la broncoscopía confirman el diagnóstico. El furosemide preejercicio reduce la incidencia."
+      },
+      pulmonDerecho: {
+        label: "Pulmón Derecho", category: "Sistema Respiratorio", type: "vital",
+        description: "El pulmón derecho equino tiene tres lóbulos (craneal, medio y caudal), lo que lo hace ligeramente más voluminoso que el izquierdo. Junto con el pulmón izquierdo, garantiza la oxigenación de hasta 75 litros de sangre por minuto durante el ejercicio máximo.",
+        facts: [
+          { label: "Lóbulos", value: "Craneal, Medio y Caudal" },
+          { label: "Vol. aprox.", value: "~22 litros" },
+          { label: "Frecuencia resp.", value: "8–16 rpm (reposo)" },
+          { label: "FR en ejercicio", value: "hasta 130 rpm" }
+        ],
+        subparts: ["Lóbulo craneal", "Lóbulo medio", "Lóbulo caudal", "Pleura visceral", "Bronquio principal derecho", "Bronquiolos", "Alvéolos"],
+        clinical: "La pleuroneumonía (pleuritis) es una emergencia veterinaria que cursa con acumulación de líquido en la cavidad pleural derecha. Se diagnostica por ultrasonografía torácica. El lóbulo caudal derecho es el más afectado en casos de neumonía por aspiración en potros."
+      }
+    }
+  },
+  bronquios: {
+    id: "bronquios",
+    label: "Bronquios",
+    icon: "Bronq.",
+    meshNames: ["bronquios"],
+    hotspots: [
+      { id: "bronq_principal", frac: [0.515, 0.606, 0.610], key: "arbolBronquial" }
+    ],
+    data: {
+      arbolBronquial: {
+        label: "Árbol Bronquial", category: "Sistema Respiratorio", type: "system",
+        description: "El árbol bronquial equino comprende los bronquios principales (derecho e izquierdo), los bronquios lobares, segmentarios y subsegmentarios, hasta los bronquiolos terminales y respiratorios. Esta red distribuye el aire a los aproximadamente 500 millones de alvéolos pulmonares de cada pulmón.",
+        facts: [
+          { label: "Bronquios principales", value: "2 (derecho e izquierdo)" },
+          { label: "Generaciones", value: "~25–30 ramificaciones" },
+          { label: "Diámetro bronquio ppal.", value: "~3–4 cm" },
+          { label: "Células ciliadas", value: "Escalera mucociliar activa" }
+        ],
+        subparts: ["Bronquio principal derecho", "Bronquio principal izquierdo", "Bronquios lobares", "Bronquios segmentarios", "Bronquiolos terminales", "Bronquiolos respiratorios", "Conductos alveolares"],
+        clinical: "La enfermedad inflamatoria de las vías aéreas (IAD) y la enfermedad pulmonar obstructiva recurrente (EPOR/RAO), equivalente al asma equino, afectan principalmente a bronquios y bronquiolos. La broncoconstricción, hipersecreción mucosa y remodelado bronquial son los hallazgos predominantes. El diagnóstico se confirma por citología del lavado broncoalveolar (BAL)."
+      }
+    }
   }
 };
