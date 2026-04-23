@@ -1,4 +1,4 @@
-import { ANATOMY } from './constants.js';
+import { ANATOMICAL_SYSTEMS } from './constants.js';
 
 const panel = document.getElementById('panel');
 const panelCat = document.getElementById('panel-cat');
@@ -8,10 +8,11 @@ const loadBar = document.getElementById('load-bar');
 const loadStatus = document.getElementById('load-status');
 const loadingScreen = document.getElementById('loading');
 const hotspotsLayer = document.getElementById('hotspots-layer');
+const systemSelector = document.getElementById('system-selector');
 
 export const hotspotEls = {};
 
-export function initUI() {
+export function initUI(onSystemChange) {
   document.getElementById('panel-close').addEventListener('click', () => {
     panel.classList.remove('open');
     setTimeout(() => { panel.style.height = ''; }, 400);
@@ -36,6 +37,19 @@ export function initUI() {
   let startHeight = 0;
   const panelHandle = document.getElementById('panel-handle');
   if (panelHandle) {
+    panelHandle.addEventListener('click', () => {
+      if (!panel.classList.contains('open')) return;
+      const currentHeight = panel.getBoundingClientRect().height;
+      const minHeight = window.innerHeight * 0.35;
+      const maxHeight = window.innerHeight * 0.85;
+      
+      if (currentHeight > minHeight * 1.2) {
+        panel.style.height = '';
+      } else {
+        panel.style.height = maxHeight + 'px';
+      }
+    });
+
     panelHandle.addEventListener('touchstart', e => {
       startY = e.touches[0].clientY;
       startHeight = panel.getBoundingClientRect().height;
@@ -71,10 +85,41 @@ export function initUI() {
       }
     });
   }
+
+  const sysToggle = document.getElementById('system-menu-toggle');
+  if (sysToggle) {
+    sysToggle.addEventListener('click', () => {
+      systemSelector.classList.toggle('expanded');
+    });
+  }
+
+  renderSystemSelector(onSystemChange);
 }
 
-export function openPanel(key) {
-  const d = ANATOMY[key];
+function renderSystemSelector(onSystemChange) {
+  if (!systemSelector) return;
+  systemSelector.innerHTML = '';
+  
+  Object.keys(ANATOMICAL_SYSTEMS).forEach((key, index) => {
+    const sys = ANATOMICAL_SYSTEMS[key];
+    const btn = document.createElement('button');
+    btn.className = `system-btn ${index === 0 ? 'active' : ''}`;
+    btn.innerHTML = `<span class="sys-icon">${sys.icon}</span><span class="sys-label">${sys.label}</span>`;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.system-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (window.innerWidth <= 768) {
+        systemSelector.classList.remove('expanded');
+      }
+      if(onSystemChange) onSystemChange(key);
+    });
+    systemSelector.appendChild(btn);
+  });
+}
+
+export function openPanel(systemId, hotspotKey) {
+  const d = ANATOMICAL_SYSTEMS[systemId].data[hotspotKey];
+  if (!d) return;
   panelCat.textContent = d.category;
   panelTitle.textContent = d.label;
   panelBody.innerHTML = `
@@ -100,14 +145,20 @@ export function hideLoading() {
   if (loadingScreen) loadingScreen.classList.add('hidden');
 }
 
-export function createHotspotDOM(hs) {
+export function createHotspotDOM(hs, systemId) {
   const div = document.createElement('div');
   div.className = 'hotspot';
-  div.innerHTML = `<div class="hotspot-inner"></div><div class="hotspot-label">${ANATOMY[hs.key].label}</div>`;
+  const labelText = ANATOMICAL_SYSTEMS[systemId].data[hs.key].label;
+  div.innerHTML = `<div class="hotspot-inner"></div><div class="hotspot-label">${labelText}</div>`;
   div.style.pointerEvents = 'all';
-  div.addEventListener('click', () => openPanel(hs.key));
+  div.addEventListener('click', () => openPanel(systemId, hs.key));
   hotspotsLayer.appendChild(div);
   hotspotEls[hs.id] = div;
+}
+
+export function clearHotspotsDOM() {
+  hotspotsLayer.innerHTML = '';
+  for(let key in hotspotEls) delete hotspotEls[key];
 }
 
 export function updateHotspotsPosition(hotspots, camera) {

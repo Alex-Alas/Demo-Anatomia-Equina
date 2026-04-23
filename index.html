@@ -17,15 +17,24 @@
 
 <header>
   <div class="logo">Demo: <span>Anatomía Equina</span></div>
-  <div class="header-right">DEMO TECNOLÓGICA<br><span style="color:var(--accent)">v0.3.0</span></div>
+  <div class="header-right">DEMO TECNOLÓGICA<br><span style="color:var(--accent)">v0.4.1</span></div>
 </header>
 
 <div id="canvas-container"></div>
 <div id="hotspots-layer" style="position:fixed;inset:0;pointer-events:none;z-index:50;"></div>
 
 <div id="mobile-instructions">
-  <div class="title">Demo: Anatomía Equina <span>v0.3.0</span></div>
+  <div class="title">Demo: Anatomía Equina <span>v0.4.1</span></div>
   <div class="hints">Arrastra para rotar • Pellizca para zoom • Toca los puntos</div>
+</div>
+
+<div id="mobile-system-menu" class="mobile-system-menu">
+  <button id="system-menu-toggle" class="fab" title="Menú de Sistemas">
+    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+  </button>
+  <div id="system-selector" class="system-selector">
+    <!-- Filled dynamically by ui.js -->
+  </div>
 </div>
 
 <div id="panel">
@@ -50,7 +59,7 @@
   <div class="legend-item"><div class="legend-dot vital"></div>Vital</div>
 </div>
 
-<div id="dev-tools-panel">
+<div id="dev-tools-panel" style="display: none;">
   <div class="dev-header" id="dev-header">
     <h3>Dev Tools: Meshes</h3>
     <button id="dev-tools-toggle">▼</button>
@@ -65,9 +74,25 @@
 </button>
 
 <div id="zoom-controls">
-  <button id="zoom-in" class="fab zoom-btn" title="Acercar">＋</button>
-  <button id="zoom-out" class="fab zoom-btn" title="Alejar">－</button>
+  <button id="zoom-in" class="zoom-btn" title="Acercar">＋</button>
+  <button id="zoom-out" class="zoom-btn" title="Alejar">－</button>
 </div>
+
+<!-- Cache Management -->
+<script>
+  const APP_VERSION = 'v0.4.1';
+  const currentVersion = localStorage.getItem('appVersion');
+  if (currentVersion !== APP_VERSION) {
+    console.log(`🔄 Version update detected. Clearing cache...`);
+    if ('caches' in window) {
+      caches.keys().then((names) => {
+        names.forEach(name => caches.delete(name));
+      });
+    }
+    localStorage.setItem('appVersion', APP_VERSION);
+    console.log('✅ Old cache successfully cleared for version ' + APP_VERSION);
+  }
+</script>
 
 <!-- Service Worker Registration -->
 <script>

@@ -1,5 +1,5 @@
-import { HOTSPOT_FRACS, MODEL_PATH } from './constants.js';
-import { initUI, createHotspotDOM, updateHotspotsPosition, setProgress, hideLoading } from './ui.js';
+import { ANATOMICAL_SYSTEMS, MODEL_PATH } from './constants.js';
+import { initUI, createHotspotDOM, updateHotspotsPosition, setProgress, hideLoading, clearHotspotsDOM } from './ui.js';
 import { initScene, loadScript } from './scene.js';
 
 // ─── STATE ────────────────────────────────────────────────────────────────
@@ -8,7 +8,8 @@ let sph = { theta: Math.PI / 4, phi: Math.PI / 3, r: 5 };
 const target = new THREE.Vector3();
 let horseModel = null;
 const modelBox = new THREE.Box3();
-const HOTSPOTS_3D = HOTSPOT_FRACS.map(h => ({ ...h, pos: new THREE.Vector3() }));
+let currentSystemId = 'exterior';
+let HOTSPOTS_3D = [];
 
 // ─── INITIALIZATION ───────────────────────────────────────────────────────
 const isMobileDevice = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
@@ -16,13 +17,31 @@ if (isMobileDevice) {
   console.log("📱 [Optimización Móvil] Activada. Aplicando recortes de renderizado y lógica agresiva...");
 }
 
-initUI();
+function loadSystem(sysId) {
+  currentSystemId = sysId;
+  clearHotspotsDOM();
+  const sys = ANATOMICAL_SYSTEMS[currentSystemId];
+  if (!sys || !sys.hotspots) {
+    HOTSPOTS_3D = [];
+    return;
+  }
+  HOTSPOTS_3D = sys.hotspots.map(h => ({ ...h, pos: new THREE.Vector3() }));
+  
+  if (!modelBox.isEmpty()) {
+    fitHotspots(modelBox);
+  }
+  HOTSPOTS_3D.forEach(hs => createHotspotDOM(hs, currentSystemId));
+}
+
+initUI((sysId) => {
+  loadSystem(sysId);
+});
 const { renderer, scene, camera, keyLight, fillLight, backLight, bottomLight, gridHelper, ground } = initScene();
 
 function updateCamera() {
   camera.position.set(
     target.x + sph.r * Math.sin(sph.phi) * Math.sin(sph.theta),
-    target.y + sph.r * -Math.cos(sph.phi),
+    target.y + sph.r * Math.cos(sph.phi),
     target.z + sph.r * Math.sin(sph.phi) * Math.cos(sph.theta)
   );
   camera.lookAt(target);
@@ -30,16 +49,24 @@ function updateCamera() {
 updateCamera();
 
 function fitHotspots(box) {
+  if (box.isEmpty()) return;
   const size = new THREE.Vector3();
   box.getSize(size);
-  HOTSPOT_FRACS.forEach((hf, i) => {
-    HOTSPOTS_3D[i].pos.set(
-      box.min.x + hf.frac[0] * size.x,
-      box.min.y + hf.frac[1] * size.y,
-      box.min.z + hf.frac[2] * size.z
-    );
+  const sys = ANATOMICAL_SYSTEMS[currentSystemId];
+  if (!sys || !sys.hotspots) return;
+  sys.hotspots.forEach((hf, i) => {
+    if (HOTSPOTS_3D[i]) {
+      HOTSPOTS_3D[i].pos.set(
+        box.min.x + hf.frac[0] * size.x,
+        box.min.y + hf.frac[1] * size.y,
+        box.min.z + hf.frac[2] * size.z
+      );
+    }
   });
 }
+
+// Initial load
+loadSystem(currentSystemId);
 
 // ─── EVENTS ───────────────────────────────────────────────────────────────
 const container = document.getElementById('canvas-container');
@@ -53,7 +80,7 @@ window.addEventListener('mouseup', () => isDragging = false);
 window.addEventListener('mousemove', e => {
   if (!isDragging) return;
   sph.theta -= (e.clientX - prevX) * 0.006;
-  sph.phi = Math.max(0.1, Math.min(Math.PI - 0.1, sph.phi + (e.clientY - prevY) * 0.006));
+  sph.phi = Math.max(0.1, Math.min(Math.PI - 0.1, sph.phi - (e.clientY - prevY) * 0.006));
   prevX = e.clientX; prevY = e.clientY;
   updateCamera();
 });
@@ -69,7 +96,7 @@ container.addEventListener('touchmove', e => {
   if (!lastTouch) return;
   const t = e.touches[0];
   sph.theta -= (t.clientX - lastTouch.clientX) * 0.008;
-  sph.phi = Math.max(0.1, Math.min(Math.PI - 0.1, sph.phi + (t.clientY - lastTouch.clientY) * 0.008));
+  sph.phi = Math.max(0.1, Math.min(Math.PI - 0.1, sph.phi - (t.clientY - lastTouch.clientY) * 0.008));
   lastTouch = t; updateCamera();
 }, { passive: true });
 
@@ -109,8 +136,21 @@ if (devHeader) {
   });
 }
 
-// ─── HOTSPOTS ─────────────────────────────────────────────────────────────
-HOTSPOTS_3D.forEach(hs => createHotspotDOM(hs));
+window.enableDevTools = function() {
+  const panel = document.getElementById('dev-tools-panel');
+  if (panel) {
+    panel.style.display = 'flex';
+    console.log("🛠️ Dev Tools activadas. El panel ahora es visible.");
+  }
+};
+window.disableDevTools = function() {
+  const panel = document.getElementById('dev-tools-panel');
+  if (panel) {
+    panel.style.display = 'none';
+    console.log("🛑 Dev Tools desactivadas. El panel ahora está oculto.");
+  }
+};
+console.log("ℹ️ Escribe enableDevTools() o disableDevTools() en la consola para controlar las herramientas de desarrollo.");
 
 // ─── RENDER LOOP ──────────────────────────────────────────────────────────
 function animate() {
