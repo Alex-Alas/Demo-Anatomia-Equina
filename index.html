@@ -17,7 +17,7 @@
 
 <header>
   <div class="logo">Demo: <span>Anatomía Equina</span></div>
-  <div class="header-right">DEMO TECNOLÓGICA<br><span style="color:var(--accent)">v0.4.2</span></div>
+  <div class="header-right">DEMO TECNOLOGICA<br><span style="color:var(--accent)">v0.5.0</span></div>
 </header>
 
 <div id="canvas-container"></div>
@@ -25,7 +25,7 @@
 
 <div id="mobile-instructions">
   <div class="title">Demo: Anatomía Equina <span>v0.4.2</span></div>
-  <div class="hints">Arrastra para rotar • Pellizca para zoom • Toca los puntos</div>
+  <div class="hints">Arrastra para rotar • Pellizca para zoom • Doble toque para enfocar • Toca los puntos</div>
 </div>
 
 <div id="mobile-system-menu" class="mobile-system-menu">
@@ -49,7 +49,8 @@
 
 <div id="hud">
   <span>↺</span> Arrastrar para rotar &nbsp;|&nbsp;
-  <span>⊕</span> Scroll para zoom &nbsp;|&nbsp;
+  <span>⊟</span> Scroll para zoom &nbsp;|&nbsp;
+  <span>○</span> Doble clic para enfocar &nbsp;|&nbsp;
   <span>●</span> Click en puntos para info
 </div>
 
@@ -80,7 +81,7 @@
 
 <!-- Cache Management -->
 <script>
-  const APP_VERSION = 'v0.4.2';
+  const APP_VERSION = 'v0.5.0';
   const currentVersion = localStorage.getItem('appVersion');
   if (currentVersion !== APP_VERSION) {
     console.log(`🔄 Version update detected. Clearing cache...`);

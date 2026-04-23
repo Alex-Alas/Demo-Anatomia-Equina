@@ -736,3 +736,22 @@ canvas {
 		background: rgba(255, 255, 255, 0.05);
 	}
 }
+
+/* ─── FOCUS RIPPLE (double-click / double-tap) ────────────────── */
+@keyframes focus-ripple-anim {
+	0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 0.9; }
+	70%  { transform: translate(-50%, -50%) scale(1.2); opacity: 0.35; }
+	100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+.focus-ripple {
+	position: fixed;
+	pointer-events: none;
+	z-index: 9999;
+	width: 72px;
+	height: 72px;
+	border-radius: 50%;
+	border: 2.5px solid var(--accent);
+	box-shadow: 0 0 18px 4px rgba(245, 158, 11, 0.45);
+	animation: focus-ripple-anim 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}

@@ -11,6 +11,11 @@ const hotspotsLayer = document.getElementById('hotspots-layer');
 const systemSelector = document.getElementById('system-selector');
 
 export const hotspotEls = {};
+let _focusCallback = null;
+
+export function setFocusCallback(cb) {
+  _focusCallback = cb;
+}
 
 export function initUI(onSystemChange) {
   document.getElementById('panel-close').addEventListener('click', () => {
@@ -145,13 +150,16 @@ export function hideLoading() {
   if (loadingScreen) loadingScreen.classList.add('hidden');
 }
 
-export function createHotspotDOM(hs, systemId) {
+export function createHotspotDOM(hs, systemId, onFocus) {
   const div = document.createElement('div');
   div.className = 'hotspot';
   const labelText = ANATOMICAL_SYSTEMS[systemId].data[hs.key].label;
   div.innerHTML = `<div class="hotspot-inner"></div><div class="hotspot-label">${labelText}</div>`;
   div.style.pointerEvents = 'all';
-  div.addEventListener('click', () => openPanel(systemId, hs.key));
+  div.addEventListener('click', () => {
+    openPanel(systemId, hs.key);
+    if (onFocus) onFocus(hs.id);
+  });
   hotspotsLayer.appendChild(div);
   hotspotEls[hs.id] = div;
 }
