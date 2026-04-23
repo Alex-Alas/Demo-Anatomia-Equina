@@ -1,5 +1,5 @@
 // Versión del caché — debe coincidir con APP_VERSION en version.js
-const APP_VERSION = 'v0.6.5';
+const APP_VERSION = 'v0.6.6';
 const CACHE_NAME = `anatomia-equina-${APP_VERSION}`;
 const ASSETS_TO_CACHE = [
   './',
