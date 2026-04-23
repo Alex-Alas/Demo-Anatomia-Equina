@@ -452,6 +452,32 @@ canvas {
 	border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Rotate toggle button */
+@keyframes spin-slow {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+}
+
+/* Rotate toggle button (lives inside #zoom-controls) */
+.rotate-zoom-btn {
+	border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#rotate-toggle-btn .rotate-btn-icon {
+	animation: spin-slow 3s linear infinite;
+	transition: color 0.3s, opacity 0.3s;
+}
+
+#rotate-toggle-btn.rotate-off {
+	border-color: rgba(255, 255, 255, 0.04);
+	color: var(--muted);
+	opacity: 0.55;
+}
+
+#rotate-toggle-btn.rotate-off .rotate-btn-icon {
+	animation-play-state: paused;
+}
+
 .panel-handle {
 	display: none;
 }

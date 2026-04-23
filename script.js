@@ -10,6 +10,7 @@ let horseModel = null;
 const modelBox = new THREE.Box3();
 let currentSystemId = 'exterior';
 let HOTSPOTS_3D = [];
+let _initialR = 5; // Set after model loads; used as reference for zoom limits
 
 // ─── CAMERA ANIMATION STATE ───────────────────────────────────────────────
 // Smooth camera transitions: when animating, we lerp both target and sph.r
@@ -35,13 +36,47 @@ function startCameraFocus(newTarget, newR) {
   camAnim.rTo = newR != null ? newR : sph.r * 0.55;
   camAnim.progress = 0;
   camAnim.active = true;
-  // Stop auto-rotation briefly so the animation feels intentional
-  autoRotate = false;
-  setTimeout(() => { autoRotate = true; }, 2200);
+  // Pause auto-rotation while animation plays + a short grace period
+  pauseAutoRotate(2500);
 }
 
-let autoRotate = true;
+// ─── AUTO-ROTATE CONTROL ─────────────────────────────────────────────────
+// autoRotateEnabled: permanent user preference (toggled via button)
+// autoRotatePaused:  temporary pause after zoom interaction
+let autoRotateEnabled = true;
+let autoRotatePaused = false;
+let autoRotatePauseTimer = null;
 let lastFrameTime = performance.now();
+
+// Returns true only when both flags allow rotation
+function shouldAutoRotate() {
+  return autoRotateEnabled && !autoRotatePaused;
+}
+
+// Pause rotation for `ms` milliseconds (resets the timer on repeated calls)
+function pauseAutoRotate(ms) {
+  autoRotatePaused = true;
+  if (autoRotatePauseTimer) clearTimeout(autoRotatePauseTimer);
+  autoRotatePauseTimer = setTimeout(() => {
+    autoRotatePaused = false;
+    autoRotatePauseTimer = null;
+  }, ms);
+}
+
+function syncRotateBtn() {
+  const btn = document.getElementById('rotate-toggle-btn');
+  if (!btn) return;
+  const icon = btn.querySelector('.rotate-btn-icon');
+  if (autoRotateEnabled) {
+    btn.classList.remove('rotate-off');
+    btn.title = 'Detener rotacion';
+    if (icon) icon.style.animationPlayState = 'running';
+  } else {
+    btn.classList.add('rotate-off');
+    btn.title = 'Activar rotacion';
+    if (icon) icon.style.animationPlayState = 'paused';
+  }
+}
 
 // ─── INITIALIZATION ───────────────────────────────────────────────────────
 const isMobileDevice = window.innerWidth <= 768 || /Mobi|Android/i.test(navigator.userAgent);
@@ -209,17 +244,25 @@ container.addEventListener('mousedown', e => {
 window.addEventListener('mouseup', () => isDragging = false);
 window.addEventListener('mousemove', e => {
   if (!isDragging) return;
-  camAnim.active = false; // Cancel any ongoing animation on manual drag
+  camAnim.active = false;
   sph.theta -= (e.clientX - prevX) * 0.006;
   sph.phi = Math.max(0.1, Math.min(Math.PI - 0.1, sph.phi - (e.clientY - prevY) * 0.006));
   prevX = e.clientX; prevY = e.clientY;
+  // Pause auto-rotate while the user is manually rotating
+  pauseAutoRotate(3000);
   updateCamera();
 });
 
 container.addEventListener('wheel', e => {
   camAnim.active = false;
-  sph.r = Math.max(0.5, Math.min(200, sph.r + e.deltaY * 0.02));
+  // Proportional zoom: factor scales with distance
+  const zoomFactor = sph.r * 0.08;
+  const delta = e.deltaY > 0 ? zoomFactor : -zoomFactor;
+  const minR = Math.max(0.4, sph.r * 0.05);  // can't get closer than 5% of current r
+  sph.r = Math.max(minR, Math.min(300, sph.r + delta));
   updateCamera();
+  // Pause auto-rotation for 10 seconds on zoom
+  pauseAutoRotate(10000);
 }, { passive: true });
 
 // ── Touch events ──────────────────────────────────────────────────────────
@@ -256,11 +299,31 @@ container.addEventListener('touchmove', e => {
     sph.theta -= (t.clientX - lastTouch.clientX) * 0.008;
     sph.phi = Math.max(0.1, Math.min(Math.PI - 0.1, sph.phi - (t.clientY - lastTouch.clientY) * 0.008));
     lastTouch = t;
+    pauseAutoRotate(3000);
     updateCamera();
+  } else if (e.touches.length === 2) {
+    // Pinch-to-zoom
+    camAnim.active = false;
+    const d = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    if (_lastPinchDist > 0) {
+      const ratio = _lastPinchDist / d;
+      const zoomFactor = sph.r * 0.08;
+      sph.r = Math.max(0.4, Math.min(300, sph.r * ratio));
+      updateCamera();
+      pauseAutoRotate(10000);
+    }
+    _lastPinchDist = d;
   }
 }, { passive: true });
 
-container.addEventListener('touchend', () => { lastTouch = null; }, { passive: true });
+container.addEventListener('touchend', e => {
+  if (e.touches.length < 2) _lastPinchDist = 0;
+}, { passive: true });
+
+let _lastPinchDist = 0;
 
 window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -268,20 +331,42 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
 });
 
+// ─── ZOOM BUTTONS (proportional + relative limits) ───────────────────────
 const zoomInBtn = document.getElementById('zoom-in');
 const zoomOutBtn = document.getElementById('zoom-out');
-if (zoomInBtn) {
-  zoomInBtn.addEventListener('click', () => {
-    camAnim.active = false;
-    sph.r = Math.max(0.5, sph.r - 2.0);
-    updateCamera();
-  });
+
+function doZoom(direction) {
+  camAnim.active = false;
+  // Step is 18% of current distance — closer = smaller step, farther = larger step
+  const step = sph.r * 0.18;
+  if (direction < 0) {
+    // Zoom in: minimum is 15% of the initial loaded radius or 0.4, whichever is greater
+    const minR = Math.max(0.4, _initialR * 0.12);
+    sph.r = Math.max(minR, sph.r - step);
+  } else {
+    // Zoom out: maximum is 3x the initial loaded radius
+    const maxR = _initialR * 3.0;
+    sph.r = Math.min(maxR, sph.r + step);
+  }
+  pauseAutoRotate(10000);
+  updateCamera();
 }
-if (zoomOutBtn) {
-  zoomOutBtn.addEventListener('click', () => {
-    camAnim.active = false;
-    sph.r = Math.min(200, sph.r + 2.0);
-    updateCamera();
+
+if (zoomInBtn)  zoomInBtn.addEventListener('click',  () => doZoom(-1));
+if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => doZoom(+1));
+
+// ─── ROTATE TOGGLE BUTTON ─────────────────────────────────────────────────
+const rotateToggleBtn = document.getElementById('rotate-toggle-btn');
+if (rotateToggleBtn) {
+  rotateToggleBtn.addEventListener('click', () => {
+    autoRotateEnabled = !autoRotateEnabled;
+    // If re-enabling, clear any pending pause timer
+    if (autoRotateEnabled && autoRotatePauseTimer) {
+      clearTimeout(autoRotatePauseTimer);
+      autoRotatePauseTimer = null;
+      autoRotatePaused = false;
+    }
+    syncRotateBtn();
   });
 }
 
@@ -335,7 +420,7 @@ function animate() {
     target.lerpVectors(camAnim.targetFrom, camAnim.targetTo, t);
     sph.r = camAnim.rFrom + (camAnim.rTo - camAnim.rFrom) * t;
     updateCamera();
-  } else if (autoRotate) {
+  } else if (shouldAutoRotate()) {
     sph.theta += 0.0008;
     updateCamera();
   }
@@ -427,10 +512,12 @@ loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js')
 
         target.copy(center);
         sph.r = diag * 1.2;
+        _initialR = sph.r; // Store initial radius for zoom limits
         camera.near = diag * 0.001;
         camera.far  = diag * 30;
         camera.updateProjectionMatrix();
         updateCamera();
+        syncRotateBtn(); // Initialize button state
 
         keyLight.position.set(diag * 1.2, diag * 2, diag);
         fillLight.position.set(-diag, diag, diag);

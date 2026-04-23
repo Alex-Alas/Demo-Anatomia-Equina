@@ -1,4 +1,5 @@
-const CACHE_NAME = 'anatomia-equina-v0.4.2';
+import { APP_VERSION } from './version.js';
+const CACHE_NAME = `anatomia-equina-${APP_VERSION}`;
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,7 +8,8 @@ const ASSETS_TO_CACHE = [
   './constants.js',
   './ui.js',
   './scene.js',
-  './script.js'
+  './script.js',
+  './version.js'
 ];
 
 // Instalar y almacenar en caché los archivos estáticos básicos
