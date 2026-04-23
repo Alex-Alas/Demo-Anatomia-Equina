@@ -1,4 +1,5 @@
-import { APP_VERSION } from './version.js';
+// Versión del caché — debe coincidir con APP_VERSION en version.js
+const APP_VERSION = 'v0.6.5';
 const CACHE_NAME = `anatomia-equina-${APP_VERSION}`;
 const ASSETS_TO_CACHE = [
   './',
@@ -9,7 +10,8 @@ const ASSETS_TO_CACHE = [
   './ui.js',
   './scene.js',
   './script.js',
-  './version.js'
+  './version.js',
+  './sw.js'
 ];
 
 // Instalar y almacenar en caché los archivos estáticos básicos

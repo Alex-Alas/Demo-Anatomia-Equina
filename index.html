@@ -111,7 +111,7 @@
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js', { type: 'module' })
+      navigator.serviceWorker.register('./sw.js')
         .then(reg => {
           console.log('ServiceWorker registrado:', reg.scope);
           
