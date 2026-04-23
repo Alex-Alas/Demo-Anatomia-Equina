@@ -31,12 +31,59 @@ function loadSystem(sysId) {
     fitHotspots(modelBox);
   }
   HOTSPOTS_3D.forEach(hs => createHotspotDOM(hs, currentSystemId));
+  updateModelVisibility();
+}
+
+function updateModelVisibility() {
+  if (!horseModel) return;
+  
+  horseModel.traverse(child => {
+    if (child.isMesh && !child.name.startsWith('Cylinder')) {
+      let shouldBeVisible = true;
+      const lowerName = child.name.toLowerCase();
+      
+      if (currentSystemId === 'esqueleto') {
+        shouldBeVisible = lowerName.includes('esqueleto') || lowerName.includes('skeleton') || lowerName.includes('bone') || lowerName.includes('hueso');
+      } else if (currentSystemId === 'muscular') {
+        shouldBeVisible = lowerName.includes('musculo') || lowerName.includes('muscle') || lowerName.includes('muscular');
+      } else if (currentSystemId === 'exterior') {
+        shouldBeVisible = !lowerName.includes('esqueleto') && !lowerName.includes('skeleton') && !lowerName.includes('bone') && !lowerName.includes('hueso') && !lowerName.includes('musculo') && !lowerName.includes('muscle') && !lowerName.includes('muscular');
+        
+        // Mobile optimization overrides for Exterior view
+        if (isMobileDevice && shouldBeVisible) {
+          const allowedMeshes = ['cabello_caballo', 'ZBrush_defualt_group010', 'pelaje'];
+          if (!allowedMeshes.includes(child.name)) {
+            shouldBeVisible = false;
+          }
+        }
+      }
+
+      child.visible = shouldBeVisible;
+
+      // Sync DevTools checkboxes if present
+      const devMeshList = document.getElementById('dev-mesh-list');
+      if (devMeshList) {
+        const labels = devMeshList.querySelectorAll('.dev-mesh-item');
+        labels.forEach(lbl => {
+          // Compare using textContent which includes the checkbox, so we trim or match child.name
+          if (lbl.textContent.trim() === child.name) {
+            const cb = lbl.querySelector('input[type="checkbox"]');
+            if (cb) cb.checked = child.visible;
+          }
+        });
+      }
+    }
+  });
+
+  if (setLighting) {
+    setLighting(currentSystemId === 'esqueleto');
+  }
 }
 
 initUI((sysId) => {
   loadSystem(sysId);
 });
-const { renderer, scene, camera, keyLight, fillLight, backLight, bottomLight, gridHelper, ground } = initScene();
+const { renderer, scene, camera, keyLight, fillLight, backLight, bottomLight, gridHelper, ground, setLighting } = initScene();
 
 function updateCamera() {
   camera.position.set(
@@ -188,7 +235,6 @@ loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js')
         model.traverse(child => {
           if (child.isMesh) {
             if (child.name.startsWith('Cylinder')) child.visible = false;
-            
             // Lógica para poblar el Dev Tools Panel
             if (devMeshList && !child.name.startsWith('Cylinder')) {
                const lbl = document.createElement('label');
@@ -196,20 +242,6 @@ loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js')
                
                const cb = document.createElement('input');
                cb.type = 'checkbox';
-               
-               // Evaluar si es una malla prescindible
-               let isHiddenByOptimization = false;
-               if (isMobileDevice) {
-                 const allowedMeshes = ['cabello_caballo', 'ZBrush_defualt_group010', 'pelaje'];
-                 if (!allowedMeshes.includes(child.name)) {
-                   isHiddenByOptimization = true;
-                   console.log(`✂️ [Optimización Móvil] Malla pre-ocultada: ${child.name}`);
-                 }
-               }
-               
-               if (isHiddenByOptimization) {
-                 child.visible = false;
-               }
                
                cb.checked = child.visible;
                cb.onchange = (e) => {
@@ -271,6 +303,7 @@ loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js')
         horseModel = model;
         modelBox.copy(box);
         fitHotspots(box);
+        updateModelVisibility(); // Apply visibility logic now that model is loaded
 
         setProgress(100, "Listo.");
         setTimeout(hideLoading, 400);
