@@ -20,7 +20,8 @@ export function initScene() {
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.01, 1000);
   
   // Lights
-  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  scene.add(ambientLight);
 
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7);
   hemiLight.position.set(0, 50, 0);
@@ -42,6 +43,16 @@ export function initScene() {
   bottomLight.position.set(0, -10, 0);
   scene.add(bottomLight);
 
+  const setLighting = (isSkeleton) => {
+    renderer.toneMappingExposure = isSkeleton ? 1.0 : 1.4;
+    ambientLight.intensity = isSkeleton ? 0.3 : 0.5;
+    hemiLight.intensity = isSkeleton ? 0.4 : 0.7;
+    keyLight.intensity = isSkeleton ? 0.8 : 1.5;
+    fillLight.intensity = isSkeleton ? 0.4 : 1.2;
+    backLight.intensity = isSkeleton ? 0.6 : 1.0;
+    bottomLight.intensity = isSkeleton ? 0.3 : 0.7;
+  };
+
   // Ground & grid
   const gridHelper = new THREE.GridHelper(20, 30, 0x2a2e2b, 0x1e2220);
   scene.add(gridHelper);
@@ -52,7 +63,7 @@ export function initScene() {
   ground.rotation.x = -Math.PI / 2;
   scene.add(ground);
 
-  return { renderer, scene, camera, keyLight, fillLight, backLight, bottomLight, gridHelper, ground };
+  return { renderer, scene, camera, keyLight, fillLight, backLight, bottomLight, gridHelper, ground, setLighting };
 }
 
 export function loadScript(src) {
