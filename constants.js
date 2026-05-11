@@ -116,7 +116,8 @@ export const ANATOMICAL_SYSTEMS = {
       { id: "resp_laringe",     frac: [0.494, 0.696, 0.745], key: "laringe" },
       { id: "resp_traquea",     frac: [0.539, 0.742, 0.732], key: "traquea" },
       { id: "resp_pulmon_izq", frac: [0.661, 0.462, 0.521], key: "pulmonIzquierdo" },
-      { id: "resp_pulmon_der", frac: [0.325, 0.465, 0.504], key: "pulmonDerecho" }
+      { id: "resp_pulmon_der", frac: [0.325, 0.465, 0.504], key: "pulmonDerecho" },
+      { id: "resp_intercambio", frac: [0.493, 0.6, 0.512], key: "intercambioGaseoso" }
     ],
     data: {
       laringe: {
@@ -166,6 +167,18 @@ export const ANATOMICAL_SYSTEMS = {
         ],
         subparts: ["Lóbulo craneal", "Lóbulo medio", "Lóbulo caudal", "Pleura visceral", "Bronquio principal derecho", "Bronquiolos", "Alvéolos"],
         clinical: "La pleuroneumonía (pleuritis) es una emergencia veterinaria que cursa con acumulación de líquido en la cavidad pleural derecha. Se diagnostica por ultrasonografía torácica. El lóbulo caudal derecho es el más afectado en casos de neumonía por aspiración en potros."
+      },
+      intercambioGaseoso: {
+        label: "Intercambio Gaseoso", category: "Fisiología Respiratoria", type: "system",
+        description: "El intercambio gaseoso en los pulmones del equino es un proceso fisiológico vital y altamente eficiente, diseñado para soportar las altas demandas metabólicas. A diferencia de rumiantes o carnívoros, el pulmón equino tiene una lobulación externa poco marcada, facilitando una expansión uniforme pero permitiendo rápida propagación de infecciones.",
+        facts: [
+          { label: "Paso 1", value: "Llegada del aire rico en oxígeno a los alvéolos" },
+          { label: "Paso 2", value: "Difusión pasiva en la red de capilares" },
+          { label: "Paso 3", value: "Difusión de O2 a la sangre y CO2 al alvéolo" },
+          { label: "Paso 4", value: "Transporte de sangre oxigenada a los tejidos" }
+        ],
+        subparts: ["Alvéolos", "Membrana alvéolo-capilar", "Capilares pulmonares", "Glóbulos rojos", "Hemoglobina"],
+        clinical: "Hemorragia Pulmonar Inducida por el Ejercicio (HPIE): Debido a la altísima presión capilar durante el galope, la delgada barrera alvéolo-capilar puede romperse. Acoplamiento Locomotor-Respiratorio: Una respiración por cada zancada en el galope. Pleuritis: La falta de lobulación hace que las pleuropatías suelan ser difusas y graves."
       }
     }
   },
