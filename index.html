@@ -3,29 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo: Anatomía del Caballo</title>
+  <title>Equus3D: Explorador Anatómico</title>
   <link rel="stylesheet" href="style-premium.css">
 </head>
 <body>
 
 <div id="loading">
-  <div class="loading-logo">Demo: <span>Anatomía Equina</span></div>
-  <div class="loading-sub">Anatomía Veterinaria · Demo</div>
+  <div class="loading-logo">Equus<span>3D</span></div>
+  <div class="loading-sub">Explorador Anatómico Interactivo</div>
   <div class="loading-version"><span class="app-version">...</span></div>
   <div class="loading-bar-wrap"><div class="loading-bar" id="load-bar"></div></div>
   <div class="loading-status" id="load-status">Iniciando escena…</div>
 </div>
 
 <header>
-  <div class="logo">Demo: <span>Anatomía Equina</span></div>
-  <div class="header-right">DEMO TECNOLOGICA<br><span class="app-version" style="color:var(--accent)">...</span></div>
+  <div class="logo">Equus<span>3D</span></div>
+  <div class="header-right">VISOR ANATÓMICO<br><span class="app-version" style="color:var(--accent)">...</span></div>
 </header>
 
 <div id="canvas-container"></div>
 <div id="hotspots-layer" style="position:fixed;inset:0;pointer-events:none;z-index:50;"></div>
 
 <div id="mobile-instructions">
-  <div class="title">Demo: Anatomía Equina <span class="app-version">...</span></div>
+  <div class="title">Equus3D <span class="app-version">...</span></div>
   <div class="hints">Arrastra para rotar • Pellizca para zoom • Doble toque para enfocar • Toca los puntos</div>
 </div>
 
@@ -49,16 +49,13 @@
 </div>
 
 <div id="hud">
-  <span>↺</span> Arrastrar para rotar &nbsp;|&nbsp;
-  <span>⊟</span> Scroll para zoom &nbsp;|&nbsp;
-  <span>○</span> Doble clic para enfocar &nbsp;|&nbsp;
-  <span>●</span> Click en puntos para info
-</div>
-
-<div id="legend">
-  <div class="legend-item"><div class="legend-dot"></div>Estructura</div>
-  <div class="legend-item"><div class="legend-dot system"></div>Sistema</div>
-  <div class="legend-item"><div class="legend-dot vital"></div>Vital</div>
+  <div id="hud-content">
+    <span>↺</span> Arrastrar para rotar &nbsp;|&nbsp;
+    <span>⊟</span> Scroll para zoom &nbsp;|&nbsp;
+    <span>○</span> Doble clic para enfocar &nbsp;|&nbsp;
+    <span>●</span> Click en puntos para info
+  </div>
+  <button id="hud-toggle" title="Minimizar controles">✕</button>
 </div>
 
 <div id="secondary-loading" class="hidden">
@@ -99,7 +96,7 @@
   document.querySelectorAll('.app-version').forEach(el => {
     el.textContent = APP_VERSION;
   });
-  document.title = `Demo: Anatomía Equina · ${APP_VERSION}`;
+  document.title = `Equus3D: Explorador Anatómico · ${APP_VERSION}`;
 
   const currentVersion = localStorage.getItem('appVersion');
   if (currentVersion !== APP_VERSION) {

@@ -285,7 +285,36 @@ canvas {
 	text-transform: uppercase;
 	color: var(--muted);
 	z-index: 100;
-	pointer-events: none;
+	z-index: 100;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#hud.minimized {
+	padding: 10px 15px;
+	border-radius: 30px;
+}
+#hud-content {
+	display: flex;
+	align-items: center;
+	transition: opacity 0.3s, width 0.3s;
+}
+#hud.minimized #hud-content {
+	display: none;
+}
+#hud-toggle {
+	background: transparent;
+	border: none;
+	color: var(--muted);
+	cursor: pointer;
+	font-size: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: color 0.3s;
+	padding: 0;
+	pointer-events: all;
+}
+#hud-toggle:hover {
+	color: var(--text);
 }
 #hud span {
 	color: var(--accent);
@@ -294,41 +323,7 @@ canvas {
 	vertical-align: middle;
 }
 
-#legend {
-	position: fixed;
-	left: 40px;
-	bottom: 40px;
-	z-index: 100;
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
-}
-.legend-item {
-	display: flex;
-	align-items: center;
-	gap: 15px;
-	font-size: 0.65rem;
-	font-weight: 800;
-	letter-spacing: 0.15em;
-	text-transform: uppercase;
-	color: var(--muted);
-}
-.legend-dot {
-	width: 8px;
-	height: 8px;
-	border-radius: 50%;
-	background: var(--accent);
-	box-shadow: 0 0 10px var(--accent);
-	flex-shrink: 0;
-}
-.legend-dot.system {
-	background: var(--accent2);
-	box-shadow: 0 0 10px var(--accent2);
-}
-.legend-dot.vital {
-	background: var(--danger);
-	box-shadow: 0 0 10px var(--danger);
-}
+
 
 #loading {
 	position: fixed;
@@ -564,8 +559,7 @@ canvas {
 
 	/* Minimize on-screen elements */
 	header,
-	#hud,
-	#legend {
+	#hud {
 		display: none !important;
 	}
 

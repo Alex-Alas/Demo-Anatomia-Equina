@@ -541,6 +541,22 @@ function doZoom(direction) {
 if (zoomInBtn)  zoomInBtn.addEventListener('click',  () => doZoom(-1));
 if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => doZoom(+1));
 
+// ─── HUD TOGGLE BUTTON ───────────────────────────────────────────────────
+const hudToggleBtn = document.getElementById('hud-toggle');
+const hudContainer = document.getElementById('hud');
+if (hudToggleBtn && hudContainer) {
+  hudToggleBtn.addEventListener('click', () => {
+    hudContainer.classList.toggle('minimized');
+    if (hudContainer.classList.contains('minimized')) {
+      hudToggleBtn.title = 'Mostrar controles';
+      hudToggleBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'; // Using SVG instead of emoji
+    } else {
+      hudToggleBtn.title = 'Minimizar controles';
+      hudToggleBtn.innerHTML = '✕';
+    }
+  });
+}
+
 // ─── ROTATE TOGGLE BUTTON ─────────────────────────────────────────────────
 const rotateToggleBtn = document.getElementById('rotate-toggle-btn');
 if (rotateToggleBtn) {
