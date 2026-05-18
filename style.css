@@ -285,3 +285,31 @@ canvas { display: block; width: 100% !important; height: 100% !important; }
     padding: 8px 12px;
   }
 }
+
+/* Species Differences comparative list styling */
+.species-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.species-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  font-size: 0.72rem;
+  line-height: 1.6;
+  color: #b8b4ac;
+}
+.species-name {
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 2px;
+}
+.species-desc {
+  font-weight: 400;
+}

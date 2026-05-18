@@ -1,5 +1,5 @@
 import { ANATOMICAL_SYSTEMS, MODEL_PATH, ALVEOLO_MODEL_PATH } from './constants.js';
-import { initUI, createHotspotDOM, updateHotspotsPosition, setProgress, hideLoading, clearHotspotsDOM } from './ui.js';
+import { initUI, createHotspotDOM, updateHotspotsPosition, setProgress, hideLoading, clearHotspotsDOM, showSecondaryLoading, hideSecondaryLoading, updateSecondaryLoadingText } from './ui.js';
 import { initScene, loadScript } from './scene.js';
 
 // ─── STATE ────────────────────────────────────────────────────────────────
@@ -178,9 +178,13 @@ function loadSystem(sysId) {
     // Use the alveolo bounding box for hotspot placement once it is loaded
     if (!alveoloBox.isEmpty()) {
       fitHotspots(alveoloBox);
+      hideSecondaryLoading();
+    } else {
+      showSecondaryLoading('Descargando modelo de alveolo...');
     }
     // Model is preloaded in the background; no need to trigger download here
   } else {
+    hideSecondaryLoading();
     if (!modelBox.isEmpty()) {
       fitHotspots(modelBox);
     }
@@ -375,6 +379,7 @@ function loadAlveoloModel() {
         fitHotspots(alveoloBox);
         updateModelVisibility();
       }
+      hideSecondaryLoading();
 
       console.log('[Alveolo] Modelo cargado correctamente.');
     },
@@ -382,11 +387,13 @@ function loadAlveoloModel() {
       if (xhr.total) {
         const pct = Math.round((xhr.loaded / xhr.total) * 100);
         console.log(`[Alveolo] Descarga: ${pct}% (${Math.round(xhr.loaded / 1024)} KB)`);
+        updateSecondaryLoadingText(`Descargando modelo... ${pct}%`);
       }
     },
     (err) => {
       alveoloModelLoading = false;
       console.error('[Alveolo] Error cargando modelo:', err);
+      hideSecondaryLoading();
     }
   );
 }

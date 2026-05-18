@@ -132,6 +132,17 @@ export function openPanel(systemId, hotspotKey) {
     <div class="panel-section"><h3>Datos Clave</h3>
       <div class="fact-grid">${d.facts.map(f=>`<div class="fact-item"><div class="fact-label">${f.label}</div><div class="fact-value">${f.value}</div></div>`).join('')}</div>
     </div>
+    ${d.species ? `
+    <div class="panel-section"><h3>Diferencias entre Especies</h3>
+      <div class="species-grid">
+        ${d.species.map(s=>`
+          <div class="species-item">
+            <span class="species-name">${s.name}</span>
+            <div class="species-desc">${s.diff}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
     <div class="panel-section"><h3>Sub-estructuras</h3>
       <div class="sub-parts">${d.subparts.map(s=>`<div class="sub-part">${s}</div>`).join('')}</div>
     </div>
@@ -148,6 +159,25 @@ export function setProgress(pct, msg) {
 
 export function hideLoading() {
   if (loadingScreen) loadingScreen.classList.add('hidden');
+}
+
+export function showSecondaryLoading(msg) {
+  const el = document.getElementById('secondary-loading');
+  const textEl = document.getElementById('secondary-loading-text');
+  if (el) {
+    if (msg && textEl) textEl.textContent = msg;
+    el.classList.remove('hidden');
+  }
+}
+
+export function hideSecondaryLoading() {
+  const el = document.getElementById('secondary-loading');
+  if (el) el.classList.add('hidden');
+}
+
+export function updateSecondaryLoadingText(msg) {
+  const textEl = document.getElementById('secondary-loading-text');
+  if (textEl) textEl.textContent = msg;
 }
 
 export function createHotspotDOM(hs, systemId, onFocus) {

@@ -791,3 +791,68 @@ canvas {
 	box-shadow: 0 0 18px 4px rgba(245, 158, 11, 0.45);
 	animation: focus-ripple-anim 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
+
+/* Species Differences comparative grid styling */
+.species-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-top: 10px;
+}
+.species-item {
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid rgba(255, 255, 255, 0.05);
+	border-radius: 8px;
+	padding: 12px 15px;
+	font-size: 0.85rem;
+	line-height: 1.6;
+	color: #d4d4d8;
+}
+.species-name {
+	font-weight: 800;
+	color: var(--accent);
+	text-transform: uppercase;
+	font-size: 0.75rem;
+	letter-spacing: 0.05em;
+	display: block;
+	margin-bottom: 4px;
+}
+.species-desc {
+	font-weight: 300;
+}
+
+#secondary-loading {
+	position: fixed;
+	top: 100px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: rgba(9, 9, 11, 0.9);
+	border: 1px solid var(--accent);
+	border-radius: 20px;
+	padding: 10px 20px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	z-index: 1000;
+	box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+	transition: opacity 0.3s;
+	pointer-events: none;
+}
+#secondary-loading.hidden {
+	opacity: 0;
+}
+.secondary-loading-spinner {
+	width: 16px;
+	height: 16px;
+	border: 2px solid var(--muted);
+	border-top-color: var(--accent);
+	border-radius: 50%;
+	animation: spin-slow 1s linear infinite;
+}
+#secondary-loading span {
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text);
+}

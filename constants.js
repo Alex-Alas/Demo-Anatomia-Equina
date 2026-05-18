@@ -346,12 +346,11 @@ export const ANATOMICAL_SYSTEMS = {
 				category: "Via Aerea Superior",
 				type: "structure",
 				description:
-					"Tubo fibrocartilaginoso que conduce el aire desde la laringe hasta la bifurcación bronquial (carina). Está formada por 48–60 anillos cartilaginosos en C conectados por músculo traqueal. Representa la principal vía de paso de aire hacia los pulmones.",
+					"Se trata de un conducto de forma cilíndrica que permite el paso del aire que conecta con órganos esenciales del sistema respiratorio como la laringe, los bronquios y los pulmones.",
 				facts: [
-					{ label: "Anillos cart.", value: "48–60 anillos en C" },
-					{ label: "Longitud", value: "~70–80 cm" },
-					{ label: "Diámetro", value: "~5–6 cm" },
-					{ label: "Bifurcación", value: "A nivel de T5 (carina)" },
+					{ label: "Anillos cart.", value: "50–60 anillos cartilaginosos" },
+					{ label: "Longitud", value: "75–80 cm" },
+					{ label: "Forma", value: "Cilíndrica (varía por porción)" },
 				],
 				subparts: [
 					"Anillos cartilaginosos",
@@ -361,22 +360,24 @@ export const ANATOMICAL_SYSTEMS = {
 					"Carina",
 				],
 				clinical:
-					"La traqueítis bacteriana y la acumulación de moco son hallazgos frecuentes en el síndrome inflamatorio de las vías respiratorias (IRAP/IAD). El lavado traqueobronquial (BAL) se utiliza para el diagnóstico citológico. La traqueostomía de emergencia puede salvar la vida en obstrucciones superiores agudas.",
+					"Traqueotomía: procedimiento quirúrgico llevado a cabo principalmente para establecer una vía respiratoria alternativa de emergencia o temporal, lo que permite que el aire pase directamente a la tráquea cuando hay alguna obstrucción grave en las vías respiratorias superiores.",
+				species: [
+					{ name: "Caballo", diff: "Tiene 50-60 anillos traqueales y una longitud de 75-80 cm, forma cilíndrica, aunque esta varía de acuerdo con sus dos porciones en las que se divide." },
+					{ name: "Vaca", diff: "Longitud media de 65 cm, la bifurcación se halla a nivel de la 5ta. costilla y se adhiere al pulmón derecho desde la 3ra. costilla." },
+					{ name: "Perro", diff: "40-45 anillos traqueales en forma de 'C', tiene una sección transversal prácticamente circular en sus extremos, su parte intermedia está aplanada dorsalmente." },
+					{ name: "Cerdo", diff: "Longitud de 15-20 cm, 32-35 anillos traqueales y está algo deprimida en sentido dorsal exceptuando su porción terminal la cual es transversal circular." }
+				]
 			},
 			pulmonIzquierdo: {
 				label: "Pulmón Izquierdo",
 				category: "Sistema Respiratorio",
 				type: "vital",
 				description:
-					"El pulmón izquierdo equino consta de dos lóbulos (craneal y caudal) y ocupa la cavidad pleural izquierda. Durante el ejercicio, la ventilación pulmonar puede alcanzar 1.200–1.800 L/min, lo que exige una integridad estructural máxima de los alvéolos y capilares pulmonares.",
+					"Órganos que ocupan la mayor parte de la cavidad torácica, se adaptan a las paredes y órganos con los cuales limitan, siendo su función el intercambio de gases para la oxigenación del cuerpo.",
 				facts: [
-					{ label: "Lóbulos", value: "Craneal y Caudal" },
-					{ label: "Vol. aprox.", value: "~20 litros" },
-					{ label: "Alvéolos", value: "~500 millones" },
-					{
-						label: "Superficie de intercambio",
-						value: "~100–120 m²",
-					},
+					{ label: "Tamaño", value: "Menor tamaño que el pulmón derecho" },
+					{ label: "Color", value: "Varía según irrigación (normalmente rosado)" },
+					{ label: "Función", value: "Intercambio de gases para oxigenación" },
 				],
 				subparts: [
 					"Lóbulo craneal",
@@ -388,19 +389,24 @@ export const ANATOMICAL_SYSTEMS = {
 					"Capilares pulmonares",
 				],
 				clinical:
-					"El sangrado pulmonar inducido por ejercicio (EIPH) afecta al 70–90% de los caballos de carrera. Se origina principalmente en el lóbulo caudal dorsal del pulmón izquierdo. La endoscopía post-ejercicio y la broncoscopía confirman el diagnóstico. El furosemide preejercicio reduce la incidencia.",
+					"Metástasis pulmonar: Los tumores metastásicos en los pulmones son cánceres que se desarrollan en otros lugares del cuerpo (u otras partes de los pulmones). Luego se propagan a través del torrente sanguíneo o el sistema linfático a los pulmones. Es diferente al cáncer pulmonar que comienza en los pulmones.",
+				species: [
+					{ name: "Caballo", diff: "Los pulmones no están divididos en lóbulos por cisuras como en la mayor parte de los mamíferos." },
+					{ name: "Bovino", diff: "Los pulmones están divididos en lóbulos por cisuras profundas, el pulmón izquierdo se halla dividido en tres partes y están en contacto con el esófago." },
+					{ name: "Cerdo", diff: "El lóbulo derecho está dividido en cuatro partes y el pulmón izquierdo puede considerarse conformado por dos o tres lóbulos." },
+					{ name: "Perro", diff: "Difiere mucho de las otras especies ya que la forma es respecto a la cavidad torácica; la cara costal de estos es convexa por las paredes laterales que están incurvadas." }
+				]
 			},
 			pulmonDerecho: {
 				label: "Pulmón Derecho",
 				category: "Sistema Respiratorio",
 				type: "vital",
 				description:
-					"El pulmón derecho equino tiene tres lóbulos (craneal, medio y caudal), lo que lo hace ligeramente más voluminoso que el izquierdo. Junto con el pulmón izquierdo, garantiza la oxigenación de hasta 75 litros de sangre por minuto durante el ejercicio máximo.",
+					"Órganos que ocupan la mayor parte de la cavidad torácica, se adaptan a las paredes y órganos con los cuales limitan, siendo su función el intercambio de gases para la oxigenación del cuerpo.",
 				facts: [
-					{ label: "Lóbulos", value: "Craneal, Medio y Caudal" },
-					{ label: "Vol. aprox.", value: "~22 litros" },
-					{ label: "Frecuencia resp.", value: "8–16 rpm (reposo)" },
-					{ label: "FR en ejercicio", value: "hasta 130 rpm" },
+					{ label: "Tamaño", value: "Mayor tamaño que el pulmón izquierdo" },
+					{ label: "Color", value: "Varía según irrigación (normalmente rosado)" },
+					{ label: "Función", value: "Intercambio de gases para oxigenación" },
 				],
 				subparts: [
 					"Lóbulo craneal",
@@ -412,7 +418,13 @@ export const ANATOMICAL_SYSTEMS = {
 					"Alvéolos",
 				],
 				clinical:
-					"La pleuroneumonía (pleuritis) es una emergencia veterinaria que cursa con acumulación de líquido en la cavidad pleural derecha. Se diagnostica por ultrasonografía torácica. El lóbulo caudal derecho es el más afectado en casos de neumonía por aspiración en potros.",
+					"Metástasis pulmonar: Los tumores metastásicos en los pulmones son cánceres que se desarrollan en otros lugares del cuerpo (u otras partes de los pulmones). Luego se propagan a través del torrente sanguíneo o el sistema linfático a los pulmones. Es diferente al cáncer pulmonar que comienza en los pulmones.",
+				species: [
+					{ name: "Caballo", diff: "Los pulmones no están divididos en lóbulos por cisuras como en la mayor parte de los mamíferos." },
+					{ name: "Bovino", diff: "Los pulmones están divididos en lóbulos por cisuras profundas, el pulmón izquierdo se halla dividido en tres partes y están en contacto con el esófago." },
+					{ name: "Cerdo", diff: "El lóbulo derecho está dividido en cuatro partes y el pulmón izquierdo puede considerarse conformado por dos o tres lóbulos." },
+					{ name: "Perro", diff: "Difiere mucho de las otras especies ya que la forma es respecto a la cavidad torácica; la cara costal de estos es convexa por las paredes laterales que están incurvadas." }
+				]
 			},
 			intercambioGaseoso: {
 				label: "Intercambio Gaseoso",
@@ -487,18 +499,11 @@ export const ANATOMICAL_SYSTEMS = {
 				category: "Sistema Respiratorio",
 				type: "system",
 				description:
-					"El árbol bronquial equino comprende los bronquios principales (derecho e izquierdo), los bronquios lobares, segmentarios y subsegmentarios, hasta los bronquiolos terminales y respiratorios. Esta red distribuye el aire a los aproximadamente 500 millones de alvéolos pulmonares de cada pulmón.",
+					"De la bifurcación de la tráquea se forman unos conductos fibrocartilaginosos conocidos como bronquios, estos se dividen en derecho e izquierdo y son los encargados de transportar el aire desde la tráquea hasta los pulmones.",
 				facts: [
-					{
-						label: "Bronquios principales",
-						value: "2 (derecho e izquierdo)",
-					},
-					{ label: "Generaciones", value: "~25–30 ramificaciones" },
-					{ label: "Diámetro bronquio ppal.", value: "~3–4 cm" },
-					{
-						label: "Células ciliadas",
-						value: "Escalera mucociliar activa",
-					},
+					{ label: "Composición", value: "Láminas cartilaginosas (en lugar de anillos)" },
+					{ label: "Relación dorsal", value: "Arteria bronquial y ganglios linfáticos" },
+					{ label: "Relación ventral", value: "Divisiones de la arteria pulmonar" },
 				],
 				subparts: [
 					"Bronquio principal derecho",
@@ -510,7 +515,13 @@ export const ANATOMICAL_SYSTEMS = {
 					"Conductos alveolares",
 				],
 				clinical:
-					"La enfermedad inflamatoria de las vías aéreas (IAD) y la enfermedad pulmonar obstructiva recurrente (EPOR/RAO), equivalente al asma equino, afectan principalmente a bronquios y bronquiolos. La broncoconstricción, hipersecreción mucosa y remodelado bronquial son los hallazgos predominantes. El diagnóstico se confirma por citología del lavado broncoalveolar (BAL).",
+					"Diagnóstico de enfermedades respiratorias: los bronquios se estudian cuando un paciente presenta tos crónica, disnea y fatiga extrema, además si estos presentan inflamación de sus paredes (bronquitis) da como resultado una producción excesiva de mocos.",
+				species: [
+					{ name: "Caballo", diff: "El bronquio derecho es un poco de mayor tamaño que el izquierdo y su dirección es menos oblicua que la del izquierdo." },
+					{ name: "Vaca", diff: "Tiene 3 bronquios principales, el bronquio para el lóbulo apical del pulmón derecho se desprende de la tráquea a nivel de la 3ra. costilla." },
+					{ name: "Cerdo", diff: "Al igual que en la vaca, se desprende también un bronquio especial para el lóbulo apical del pulmón derecho." },
+					{ name: "Perro", diff: "Los bronquios principales divergen en ángulo agudo y cada uno se divide en dos ramas antes de penetrar el pulmón, pero la ramificación difiere en los dos pulmones." }
+				]
 			},
 		},
 	},
@@ -519,7 +530,63 @@ export const ANATOMICAL_SYSTEMS = {
 		label: "Alveolo",
 		icon: "Alv.",
 		isSecondaryModel: true,
-		hotspots: [],
-		data: {},
+		hotspots: [
+			{
+				id: "alveolo_intercambio_gaseoso",
+				frac: [0.418, 0.645, 0.829],
+				key: "Intercambio gaseoso",
+			},
+		],
+		data: {
+			"Intercambio gaseoso": {
+				label: "Intercambio Gaseoso",
+				category: "Fisiología Alveolar",
+				type: "system",
+				description:
+					"El intercambio gaseoso en los pulmones del equino es un proceso fisiológico vital y altamente eficiente, diseñado para soportar las altas demandas metabólicas del caballo, especialmente durante el ejercicio, donde pueden aumentar su consumo de oxígeno de manera exponencial.",
+				facts: [
+					{
+						label: "Paso 1 Llegada del Aire",
+						value: "El aire rico en oxígeno ingresa por las fosas nasales (son respiradores nasales obligados) y viaja por la tráquea, bronquios y bronquiolos hasta los alvéolos.",
+					},
+					{
+						label: "Paso 2 Difusión Alveolar",
+						value: "En los alvéolos, diminutos sacos aéreos rodeados por una densa red de capilares, ocurre la difusión pasiva.",
+					},
+					{
+						label: "Paso 3 Oxígeno / CO2",
+						value: "Debido a la alta concentración en el alvéolo y baja en la sangre, el oxígeno pasa a través de la membrana alvéolo-capilar (de una sola capa celular) hacia la sangre, uniéndose a la hemoglobina de los glóbulos rojos. El dióxido de carbono (desecho) presente en alta concentración en la sangre capilar pasa al alvéolo para ser exhalado.",
+					},
+					{
+						label: "Paso 4 Transporte",
+						value: "La sangre oxigenada regresa al corazón (aurícula y ventrículo izquierdos) para ser distribuida a los músculos y tejidos.",
+					},
+				],
+				species: [
+					{
+						name: "Caballo",
+						diff: "A diferencia de los rumiantes o carnívoros, el pulmón del equino tiene una lobulación externa muy poco marcada. Presenta ausencia de septos interlobulillares profundos, por lo que el parénquima es continuo; esto facilita una expansión uniforme pero permite la rápida propagación de infecciones. Posee un volumen pulmonar inmenso y una barrera alvéolo-capilar extremadamente delgada (vulnerable bajo estrés mecánico extremo).",
+					},
+					{
+						name: "Bovino",
+						diff: "Los pulmones están claramente divididos por tabiques (septos) profundos de tejido conectivo, marcando una lobulación externa muy evidente, lo que limita la propagación rápida de infecciones pero restringe la expansión uniforme.",
+					},
+					{
+						name: "Otras Especies",
+						diff: "Los rumiantes y carnívoros presentan divisiones lobulares bien definidas, a diferencia del parénquima continuo y uniforme del equino.",
+					},
+				],
+				subparts: [
+					"Membrana alvéolo-capilar",
+					"Red de capilares",
+					"Glóbulos rojos",
+					"Hemoglobina",
+					"Neumocitos Tipo I",
+					"Neumocitos Tipo II",
+				],
+				clinical:
+					"Hemorragia Pulmonar Inducida por el Ejercicio (HPIE): Debido a la altísima presión capilar que se genera durante el galope intenso, la barrera alvéolo-capilar puede romperse. Acoplamiento Locomotor-Respiratorio: El caballo es una de las pocas especies donde la respiración está rígidamente acoplada al ciclo de locomoción (en el galope, una respiración por cada zancada). La masa visceral empuja el diafragma hacia adelante y atrás como un pistón, lo que significa que el intercambio gaseoso depende directamente de la eficiencia de la zancada. Pleuritis y Efusión Pleural: Dada la posición del corazón y la profundidad del pecho (relevancia topográfica), el espacio pleural es vasto. La falta de lobulación marcada hace que las pleuropatías suelen ser difusas y graves, comprometiendo rápidamente la superficie de intercambio de ambos pulmones.",
+			},
+		},
 	},
 };
