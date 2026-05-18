@@ -1,6 +1,9 @@
 export const MODEL_PATH =
 	"https://huggingface.co/datasets/alx-dot-wav/anatomia-equina-assets/resolve/main/caballo.glb";
 
+export const ALVEOLO_MODEL_PATH =
+	"https://huggingface.co/datasets/alx-dot-wav/anatomia-equina-assets/resolve/main/Modelado5%20nueva%20animacion.glb";
+
 export const ANATOMICAL_SYSTEMS = {
 	exterior: {
 		id: "exterior",
@@ -510,5 +513,13 @@ export const ANATOMICAL_SYSTEMS = {
 					"La enfermedad inflamatoria de las vías aéreas (IAD) y la enfermedad pulmonar obstructiva recurrente (EPOR/RAO), equivalente al asma equino, afectan principalmente a bronquios y bronquiolos. La broncoconstricción, hipersecreción mucosa y remodelado bronquial son los hallazgos predominantes. El diagnóstico se confirma por citología del lavado broncoalveolar (BAL).",
 			},
 		},
+	},
+	alveolo: {
+		id: "alveolo",
+		label: "Alveolo",
+		icon: "Alv.",
+		isSecondaryModel: true,
+		hotspots: [],
+		data: {},
 	},
 };

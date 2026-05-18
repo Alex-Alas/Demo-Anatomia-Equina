@@ -1,4 +1,4 @@
-import { ANATOMICAL_SYSTEMS, MODEL_PATH } from './constants.js';
+import { ANATOMICAL_SYSTEMS, MODEL_PATH, ALVEOLO_MODEL_PATH } from './constants.js';
 import { initUI, createHotspotDOM, updateHotspotsPosition, setProgress, hideLoading, clearHotspotsDOM } from './ui.js';
 import { initScene, loadScript } from './scene.js';
 
@@ -7,7 +7,12 @@ let isDragging = false, prevX = 0, prevY = 0;
 let sph = { theta: Math.PI / 4, phi: Math.PI / 3, r: 5 };
 const target = new THREE.Vector3();
 let horseModel = null;
+let alveoloModel = null;
+let alveoloModelLoading = false;
+let alveoloMixer = null;   // AnimationMixer for the alveolo model
+let alveoloClips = [];     // Raw AnimationClips from the GLTF
 const modelBox = new THREE.Box3();
+const alveoloBox = new THREE.Box3();
 let currentSystemId = 'exterior';
 let HOTSPOTS_3D = [];
 let _initialR = 5; // Set after model loads; used as reference for zoom limits
@@ -164,13 +169,23 @@ function loadSystem(sysId) {
   const sys = ANATOMICAL_SYSTEMS[currentSystemId];
   if (!sys || !sys.hotspots) {
     HOTSPOTS_3D = [];
+    updateModelVisibility();
     return;
   }
   HOTSPOTS_3D = sys.hotspots.map(h => ({ ...h, pos: new THREE.Vector3() }));
-  
-  if (!modelBox.isEmpty()) {
-    fitHotspots(modelBox);
+
+  if (sys.isSecondaryModel) {
+    // Use the alveolo bounding box for hotspot placement once it is loaded
+    if (!alveoloBox.isEmpty()) {
+      fitHotspots(alveoloBox);
+    }
+    // Model is preloaded in the background; no need to trigger download here
+  } else {
+    if (!modelBox.isEmpty()) {
+      fitHotspots(modelBox);
+    }
   }
+
   HOTSPOTS_3D.forEach(hs => createHotspotDOM(hs, currentSystemId, onHotspotFocus));
   updateModelVisibility();
 }
@@ -185,48 +200,71 @@ function onHotspotFocus(hotspotId) {
 }
 
 function updateModelVisibility() {
-  if (!horseModel) return;
-  
-  horseModel.traverse(child => {
-    if (child.isMesh && !child.name.startsWith('Cylinder')) {
-      let shouldBeVisible = true;
-      const lowerName = child.name.toLowerCase();
-      
-      const sys = ANATOMICAL_SYSTEMS[currentSystemId];
-      if (currentSystemId === 'esqueleto') {
-        shouldBeVisible = lowerName.includes('esqueleto') || lowerName.includes('skeleton') || lowerName.includes('bone') || lowerName.includes('hueso');
-      } else if (currentSystemId === 'muscular') {
-        shouldBeVisible = lowerName.includes('musculo') || lowerName.includes('muscle') || lowerName.includes('muscular');
-      } else if (sys && sys.meshNames) {
-        // Generic mesh-name-based filter for systems that declare meshNames (e.g. respiratorio, bronquios)
-        shouldBeVisible = sys.meshNames.some(n => lowerName.includes(n.toLowerCase()));
-      } else if (currentSystemId === 'exterior') {
-        shouldBeVisible = !lowerName.includes('esqueleto') && !lowerName.includes('skeleton') && !lowerName.includes('bone') && !lowerName.includes('hueso') && !lowerName.includes('musculo') && !lowerName.includes('muscle') && !lowerName.includes('muscular');
-        
-        // Mobile optimization overrides for Exterior view
-        if (isMobileDevice && shouldBeVisible) {
-          const allowedMeshes = ['cabello_caballo', 'ZBrush_defualt_group010', 'pelaje'];
-          if (!allowedMeshes.includes(child.name)) {
-            shouldBeVisible = false;
+  const sys = ANATOMICAL_SYSTEMS[currentSystemId];
+  const isSecondary = !!(sys && sys.isSecondaryModel);
+
+  // Toggle the horse model: hide entirely when a secondary-model system is active
+  if (horseModel) {
+    horseModel.visible = !isSecondary;
+
+    if (!isSecondary) {
+      horseModel.traverse(child => {
+        if (child.isMesh && !child.name.startsWith('Cylinder')) {
+          let shouldBeVisible = true;
+          const lowerName = child.name.toLowerCase();
+
+          if (currentSystemId === 'esqueleto') {
+            shouldBeVisible = lowerName.includes('esqueleto') || lowerName.includes('skeleton') || lowerName.includes('bone') || lowerName.includes('hueso');
+          } else if (currentSystemId === 'muscular') {
+            shouldBeVisible = lowerName.includes('musculo') || lowerName.includes('muscle') || lowerName.includes('muscular');
+          } else if (sys && sys.meshNames) {
+            shouldBeVisible = sys.meshNames.some(n => lowerName.includes(n.toLowerCase()));
+          } else if (currentSystemId === 'exterior') {
+            shouldBeVisible = !lowerName.includes('esqueleto') && !lowerName.includes('skeleton') && !lowerName.includes('bone') && !lowerName.includes('hueso') && !lowerName.includes('musculo') && !lowerName.includes('muscle') && !lowerName.includes('muscular');
+
+            if (isMobileDevice && shouldBeVisible) {
+              const allowedMeshes = ['cabello_caballo', 'ZBrush_defualt_group010', 'pelaje'];
+              if (!allowedMeshes.includes(child.name)) {
+                shouldBeVisible = false;
+              }
+            }
+          }
+
+          child.visible = shouldBeVisible;
+
+          const devMeshList = document.getElementById('dev-mesh-list');
+          if (devMeshList) {
+            const labels = devMeshList.querySelectorAll('.dev-mesh-item');
+            labels.forEach(lbl => {
+              if (lbl.textContent.trim() === child.name) {
+                const cb = lbl.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = child.visible;
+              }
+            });
           }
         }
-      }
+      });
+    }
+  }
 
-      child.visible = shouldBeVisible;
-
-      // Sync DevTools checkboxes if present
-      const devMeshList = document.getElementById('dev-mesh-list');
-      if (devMeshList) {
-        const labels = devMeshList.querySelectorAll('.dev-mesh-item');
-        labels.forEach(lbl => {
-          if (lbl.textContent.trim() === child.name) {
-            const cb = lbl.querySelector('input[type="checkbox"]');
-            if (cb) cb.checked = child.visible;
-          }
+  // Toggle the alveolo model: visible only when its system is active
+  if (alveoloModel) {
+    alveoloModel.visible = isSecondary;
+    // Play or pause the animation to match visibility
+    if (alveoloMixer) {
+      if (isSecondary) {
+        // Re-play all clips from the start when the view becomes active
+        alveoloMixer.stopAllAction();
+        alveoloClips.forEach(clip => {
+          const action = alveoloMixer.clipAction(clip);
+          action.setLoop(THREE.LoopRepeat, Infinity);
+          action.reset().play();
         });
+      } else {
+        alveoloMixer.stopAllAction();
       }
     }
-  });
+  }
 }
 
 initUI((sysId) => {
@@ -259,6 +297,98 @@ function fitHotspots(box) {
       );
     }
   });
+}
+
+// ─── ALVEOLO MODEL LOADER ─────────────────────────────────────────────────
+function loadAlveoloModel() {
+  // GLTFLoader must be available (loaded during the horse model init sequence)
+  if (!THREE.GLTFLoader) {
+    setTimeout(loadAlveoloModel, 500);
+    return;
+  }
+  alveoloModelLoading = true;
+  setProgress(10, 'Cargando modelo de alveolo...');
+
+  const loader = new THREE.GLTFLoader();
+  try {
+    const draco = new THREE.DRACOLoader();
+    draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+    loader.setDRACOLoader(draco);
+  } catch(e) {}
+
+  loader.load(
+    ALVEOLO_MODEL_PATH,
+    (gltf) => {
+      const model = gltf.scene;
+
+      // Center the model fully on all three axes (unlike the horse, which is floor-anchored).
+      // Then lift it to the horse model's scene center height so the orbital camera
+      // already points at it without any repositioning.
+      const box1 = new THREE.Box3().setFromObject(model);
+      const center1 = new THREE.Vector3();
+      box1.getCenter(center1);
+
+      // The horse scene target is stored in `target` (set after the horse loads).
+      // Offset Y so the alveolo center lands at the same height as the horse center.
+      const horseTargetY = target.y;
+      model.position.set(
+        -center1.x,
+        -center1.y + horseTargetY,
+        -center1.z
+      );
+
+      // Apply material fixes
+      model.traverse(child => {
+        if (child.isMesh) {
+          if (child.material && child.material.map) {
+            child.material.map.encoding = THREE.sRGBEncoding;
+          }
+          if (isMobileDevice && child.material) {
+            if (child.material.normalMap) child.material.normalMap = null;
+            if (child.material.roughnessMap) child.material.roughnessMap = null;
+            if (child.material.metalnessMap) child.material.metalnessMap = null;
+          }
+        }
+      });
+
+      scene.add(model);
+      alveoloModel = model;
+      alveoloModelLoading = false;
+
+      // Set up AnimationMixer so the gas-exchange animation plays on loop
+      if (gltf.animations && gltf.animations.length > 0) {
+        alveoloClips = gltf.animations;
+        alveoloMixer = new THREE.AnimationMixer(model);
+        console.log(`[Alveolo] ${gltf.animations.length} animacion(es) encontrada(s).`);
+      } else {
+        console.warn('[Alveolo] El modelo no contiene animaciones.');
+      }
+
+      // Compute bounding box after positioning
+      alveoloBox.setFromObject(model);
+
+      // Always start hidden; updateModelVisibility will show + play if needed
+      model.visible = false;
+
+      // If alveolo system is already active when the download finishes, show it now
+      if (currentSystemId === 'alveolo') {
+        fitHotspots(alveoloBox);
+        updateModelVisibility();
+      }
+
+      console.log('[Alveolo] Modelo cargado correctamente.');
+    },
+    (xhr) => {
+      if (xhr.total) {
+        const pct = Math.round((xhr.loaded / xhr.total) * 100);
+        console.log(`[Alveolo] Descarga: ${pct}% (${Math.round(xhr.loaded / 1024)} KB)`);
+      }
+    },
+    (err) => {
+      alveoloModelLoading = false;
+      console.error('[Alveolo] Error cargando modelo:', err);
+    }
+  );
 }
 
 // Initial load
@@ -486,6 +616,11 @@ function animate() {
     updateCamera();
   }
 
+  // ── Alveolo animation tick ─────────────────────────────────────────────
+  if (alveoloMixer && alveoloModel && alveoloModel.visible) {
+    alveoloMixer.update(delta);
+  }
+
   renderer.render(scene, camera);
   updateHotspotsPosition(HOTSPOTS_3D, camera);
 }
@@ -593,6 +728,12 @@ loadScript('https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js')
         setProgress(100, 'Listo.');
         setTimeout(hideLoading, 400);
         animate();
+
+        // Begin downloading the alveolo model in the background so it is
+        // ready when the user navigates to that view.
+        if (!alveoloModel && !alveoloModelLoading) {
+          loadAlveoloModel();
+        }
       },
       (xhr) => {
         if (xhr.total) {
