@@ -850,3 +850,23 @@ canvas {
 	text-transform: uppercase;
 	color: var(--text);
 }
+
+/* --- Landscape Mobile Adjustments --- */
+@media (max-height: 500px) and (orientation: landscape) {
+	.system-selector {
+		max-height: 60vh;
+		overflow-y: auto;
+		padding-right: 5px;
+	}
+	.system-selector::-webkit-scrollbar {
+		width: 4px;
+	}
+	.system-selector::-webkit-scrollbar-thumb {
+		background: var(--accent);
+		border-radius: 4px;
+	}
+	.system-btn {
+		padding: 8px 12px;
+		min-width: 140px;
+	}
+}
